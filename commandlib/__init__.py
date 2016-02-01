@@ -1,8 +1,11 @@
 import copy
 from os import path, chdir, getcwd, listdir, access
 from os.path import join, isfile, exists
-from subprocess import check_call, CalledProcessError
+from subprocess import call
 import os
+
+class CommandError(Exception):
+    pass
 
 
 class Command(object):
@@ -25,8 +28,9 @@ class Command(object):
     def env(self):
         env_vars = os.environ.copy()
         env_vars.update(self._env)
-        old_path = [env_vars["PATH"], ] if "PATH" in env_vars else []
-        new_path = ":".join([old_path] + self._paths)
+        new_path = ":".join(
+            [env_vars["PATH"], ] if "PATH" in env_vars else [] + self._paths
+        )
         env_vars["PATH"] = new_path
         return env_vars
 
@@ -106,7 +110,7 @@ class BinaryPath(object):
             absfilename = join(bin_directory, filename)
             
             if isfile(absfilename) and access(absfilename, os.X_OK):
-                property_name = filename.replace(".", "_")
+                property_name = filename.replace(".", "_").replace("-", "_")
                 setattr(self, property_name, Command(absfilename, paths=[bin_directory, ]))
 
 
@@ -114,20 +118,22 @@ class BinaryPath(object):
 def run(command):
     """Run Command object."""
     if type(command) != Command:
-        raise RuntimeError("Command must be of type commandlib.Command")
+        raise CommandError("Command must be of type commandlib.Command")
 
     previous_directory = getcwd()
 
     if command.directory is not None:
         if not exists(command.directory):
-            raise RuntimeError("Directory {0} does not exist".format(directory))
+            raise CommandError("Cannot run {0} - directory {0} does not exist".format(
+                command.__repr__(), directory
+            ))
         chdir(command.directory)
 
-    try:
-        check_call(command.arguments, env=command.env, shell=command.shell)
-    except CalledProcessError:
-        chdir(previous_directory)
-        if not command.ignore_errors:
-            raise RuntimeError("Command raised error code")
-        
+    returncode = call(command.arguments, env=command.env, shell=command.shell)
     chdir(previous_directory)
+
+    if returncode != 0 and not command.ignore_errors:
+        raise CommandError("{0} failed (err code {0})".format(
+            command.__repr__(),
+            returncode
+        ))
