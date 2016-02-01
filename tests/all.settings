@@ -1,0 +1,7 @@
+python_versions:
+  - 2.6.6
+  - 2.7.10
+  - 3.3.0
+  - 3.5.0
+failfast: true
+pause_on_failure: true

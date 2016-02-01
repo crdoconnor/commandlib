@@ -1,0 +1,10 @@
+{% for python_version in python_versions %}
+- name: Run simple command line
+  preconditions:
+    python_version: {{ python_version }}
+  tags:
+    - py{{ python_version }}
+  scenario:
+    - Assert true: |
+        Command("ls")("-l").__repr__() == 'ls -l'
+{% endfor %}
