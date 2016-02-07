@@ -2,7 +2,7 @@ CommandLib
 ==========
 
 CommandLib is a pythonic wrapper around subprocess that lets you pass around command objects
-and daisy-chain:
+in a way that creates more readable scripts. It lets you daisy-chain:
 
 * Arguments
 * Paths
@@ -37,9 +37,12 @@ API
     >>> py = py.with_path("/home/user/bin")                          # Run with additional path (added to PATH environment variable when command is run)
     >>> py = py.in_dir("/home/user/mydir")                           # Run in specified directory.
     >>> py = py.with_shell()                                         # Run with shell
+    >>> py = py.only_errors()                                        # Suppress stderr
+    >>> py = py.silently()                                           # Suppress stdout and stderr
 
-Why
----
+
+Why?
+----
 
 Commandlib is a library to make it easier to pass around command objects between different
 modules and classes and incrementally modify the command's behavior in a readable way
@@ -55,13 +58,24 @@ Advanced API
 Add trailing arguments:
 
     >>> from commandlib import Command, run
-    >>> manage = Command("/usr/bin/python").with_trailing_arguments("--settings", "local_settings.py").in_dir("projectdir")
-    >>> run(manage("runserver"))    # Runs "/usr/bin/python manage.py runserver --settings local_settings.py"
+    >>> manage = Command(["/usr/bin/python", "manage.py"]).with_trailing_arguments("--settings", "local_settings.py").in_dir("projectdir")
+    >>> run(manage("runserver"))
+    [ Runs "/usr/bin/python manage.py runserver --settings local_settings.py" inside projectdir ]
 
-Dynamically generate bin directories:
+Dynamically generate command bundles from directories with executables in them:
 
-    >>> from commandlib import BinDirectory, Command, run
-    >>> postgres94 = BinDirectory("/usr/lib/postgresql/9.4/bin/")
+    >>> from commandlib import Commands, Command, run
+    >>> postgres94 = Commands("/usr/lib/postgresql/9.4/bin/")
+    >>> run(postgres94.postgres)
+    [ Runs postgres ]
+    
+    >>> run(postgres94.createdb)
+    [ Runs createdb ]
+
+Use with path.py (or any other library where str(object) resolves to a string:
+
+    >>> from path import Path
+    >>> postgres94 = Commands(Path("/usr/lib/postgresql/9.4/bin/"))
     >>> run(postgres94.postgres)
 
 
@@ -70,7 +84,8 @@ Hacking
 
 If you want to hack, you can TDD with::
 
-  sudo pip install hitch
-  cd tests
-  hitch init
-  hitch test . --settings tdd.settings
+    curl https://raw.githubusercontent.com/mitsuhiko/pipsi/master/get-pipsi.py | python
+    pipsi install hitch
+    cd tests
+    hitch init
+    hitch test . --settings tdd.settings

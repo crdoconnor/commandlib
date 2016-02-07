@@ -9,7 +9,10 @@ class CommandError(Exception):
 
 
 class Command(object):
-    def __init__(self, arguments, directory=None, env=None, shell=False, trailing_args=None, paths=None):
+    def __init__(
+        self, arguments, directory=None, env=None, shell=False,
+        trailing_args=None, paths=None
+    ):
         if type(arguments) is not list:
             arguments = [str(arguments), ]
         self._arguments = [str(arg) for arg in arguments]
@@ -76,19 +79,16 @@ class Command(object):
         new_command._paths.append(str(path))
         return new_command
 
-    def ignore_errors(self):
-        new_command = copy.deepcopy(self)
-        new_command._ignore_errors = True
-        return new_command
-
-    def in_silence(self):
-        new_command = copy.deepcopy(self)
-        new_command._silent = True
-        return new_command
-
-    def no_stdout(self):
+    def silently(self):
         new_command = copy.deepcopy(self)
         new_command._silent_stdout = True
+        new_command._silent_stderr = True
+        return new_command
+
+    def only_errors(self):
+        new_command = copy.deepcopy(self)
+        new_command._silent_stdout = True
+        new_command._silent_stderr = False
         return new_command
 
     def __str__(self):
@@ -102,16 +102,25 @@ class Command(object):
 
 
 
-class BinaryPath(object):
-    def __init__(self, bin_directory):
+class Commands(object):
+    def __init__(self, bin_directory=None):
         self.bin_directory = bin_directory
 
-        for filename in listdir(bin_directory):
-            absfilename = join(bin_directory, filename)
-            
-            if isfile(absfilename) and access(absfilename, os.X_OK):
-                property_name = filename.replace(".", "_").replace("-", "_")
-                setattr(self, property_name, Command(absfilename, paths=[bin_directory, ]))
+        if bin_directory is not None:
+            for filename in listdir(bin_directory):
+                absfilename = join(bin_directory, filename)
+                
+                if isfile(absfilename) and access(absfilename, os.X_OK):
+                    setattr(
+                        self,
+                        filename.replace(".", "_").replace("-", "_"),
+                        Command(absfilename, paths=[bin_directory, ])
+                    )
+
+    def __setattr__(self, name, value):
+        if type(value) != Command:
+            raise CommandError("Command must be of type commandlib.Command")
+        self.__dict__[name] = value
 
 
 
@@ -124,12 +133,21 @@ def run(command):
 
     if command.directory is not None:
         if not exists(command.directory):
-            raise CommandError("Cannot run {0} - directory {0} does not exist".format(
-                command.__repr__(), directory
-            ))
+            raise CommandError(
+                "Cannot run {0} - directory {0} does not exist".format(
+                    command.__repr__(), directory
+                )
+            )
         chdir(command.directory)
 
-    returncode = call(command.arguments, env=command.env, shell=command.shell)
+    returncode = call(
+        command.arguments,
+        env=command.env,
+        shell=command.shell,
+        stdout=subprocess.PIPE if command._silent_stdout else None,
+        stderr=subprocess.PIPE if command._silent_stderr else None,
+    )
+    
     chdir(previous_directory)
 
     if returncode != 0 and not command.ignore_errors:
