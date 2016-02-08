@@ -22,6 +22,8 @@ class Command(object):
         self._paths = [str(path) for path in paths] if paths is not None else []
         self._trailing_args = [str(arg) for arg in trailing_args] \
             if trailing_args is not None else []
+        self._silent_stdout = False
+        self._silent_stderr = False
 
     @property
     def arguments(self):
