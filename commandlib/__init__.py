@@ -1,7 +1,7 @@
 import copy
 from os import path, chdir, getcwd, listdir, access
 from os.path import join, isfile, exists
-from subprocess import call
+from subprocess import call, PIPE
 import os
 
 class CommandError(Exception):
@@ -152,8 +152,8 @@ def run(command):
         command.arguments,
         env=command.env,
         shell=command.shell,
-        stdout=subprocess.PIPE if command._silent_stdout else None,
-        stderr=subprocess.PIPE if command._silent_stderr else None,
+        stdout=PIPE if command._silent_stdout else None,
+        stderr=PIPE if command._silent_stderr else None,
     )
     
     chdir(previous_directory)
