@@ -10,9 +10,15 @@ class CommandError(Exception):
 
 class Command(object):
     def __init__(
-        self, arguments, directory=None, env=None, shell=False,
-        trailing_args=None, paths=None
+        self,
+        arguments,
+        directory=None,
+        env=None,
+        shell=False,
+        trailing_args=None,
+        paths=None
     ):
+        """Create new command object."""
         if type(arguments) is not list:
             arguments = [str(arguments), ]
         self._arguments = [str(arg) for arg in arguments]
@@ -45,7 +51,7 @@ class Command(object):
         
     @property
     def shell(self):
-        return self._directory
+        return self._shell
 
     def __call__(self, *arguments):
         args = [str(arg) for arg in arguments]
