@@ -30,6 +30,7 @@ class Command(object):
             if trailing_args is not None else []
         self._silent_stdout = False
         self._silent_stderr = False
+        self._ignore_errors = False
 
     @property
     def arguments(self):
@@ -44,14 +45,15 @@ class Command(object):
         )
         env_vars["PATH"] = new_path
         return env_vars
+    
+    def ignore_errors(self):
+        new_command = copy.deepcopy(self)
+        new_command._ignore_errors = True
+        return new_command
 
     @property
     def directory(self):
         return self._directory
-        
-    @property
-    def shell(self):
-        return self._shell
 
     def __call__(self, *arguments):
         args = [str(arg) for arg in arguments]
@@ -151,15 +153,15 @@ def run(command):
     returncode = call(
         command.arguments,
         env=command.env,
-        shell=command.shell,
+        shell=command._shell,
         stdout=PIPE if command._silent_stdout else None,
         stderr=PIPE if command._silent_stderr else None,
     )
     
     chdir(previous_directory)
 
-    if returncode != 0 and not command.ignore_errors:
-        raise CommandError("{0} failed (err code {0})".format(
+    if returncode != 0 and not command._ignore_errors:
+        raise CommandError('"{0}" failed (err code {1})'.format(
             command.__repr__(),
             returncode
         ))
