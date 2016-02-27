@@ -71,7 +71,7 @@ class Command(object):
 
     def in_dir(self, directory):
         new_command = copy.deepcopy(self)
-        new_command._directory = directory
+        new_command._directory = str(directory)
         return new_command
 
     def with_shell(self):
