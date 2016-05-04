@@ -1,18 +1,17 @@
 {% for python_version in python_versions %}
-- name: Run simple command line
+- name: Simple command with arguments
   preconditions:
     python_version: {{ python_version }}
     scripts:
       outputtext: |
         #!/bin/bash
-        echo hello > output
+        echo hello $1 > output
   tags:
     - py{{ python_version }}
+    - arguments
   scenario:
-    - Assert true: |
-        Command("./outputtext").__repr__() == './outputtext'
-    - Run command: run(Command("./outputtext"))
+    - Run command: Command("./outputtext", "mark").run()
     - Assert file contains:
         filename: output
-        contents: hello
+        contents: hello mark
 {% endfor %}

@@ -1,0 +1,39 @@
+{% for python_version in python_versions %}
+- name: Simple command path
+  preconditions:
+    python_version: {{ python_version }}
+    scripts:
+      bin_directory/command1: |
+        #!/bin/bash
+        echo hello $1 > output
+      bin_directory/command2: |
+        #!/bin/bash
+        echo hello $1 > output
+      bin_directory/command_calling_command_in_path: |
+        #!/bin/bash
+        command1 tom
+      bin_directory/command.with.dots: |
+        #!/bin/bash
+        echo hello dots > output
+  tags:
+    - py{{ python_version }}
+    - command-path
+  scenario:
+    - Run command: from commandlib import CommandPath
+    - Run command: command_path = CommandPath("./bin_directory")
+    - Run command: command_path.command1("harry").run()
+    - Assert file contains:
+        filename: output
+        contents: hello harry
+    - Run command: command_path.command_calling_command_in_path("tom").run()
+    - Assert file contains:
+        filename: output
+        contents: hello tom
+    - Run command: command_path.command_with_dots("tom").run()
+    - Assert file contains:
+        filename: output
+        contents: hello dots
+    - Assert Exception:
+        command: command_path.non_existent_command
+        exception: CommandError
+{% endfor %}

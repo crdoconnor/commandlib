@@ -1,0 +1,29 @@
+{% for python_version in python_versions %}
+- name: Simple command with environment vars
+  preconditions:
+    python_version: {{ python_version }}
+    scripts:
+      outputtext: |
+        #!/bin/bash
+        echo hello $ENVVAR > output
+      outputpath: |
+        #!/bin/bash
+        echo hello $HOME > output
+  tags:
+    - py{{ python_version }}
+    - env-vars
+    - path
+  scenario:
+    - Run command: Command("./outputtext").with_env(ENVVAR="tom").run()
+    - Assert file contains:
+        filename: output
+        contents: hello tom
+    - Run command: Command("./outputpath").without_env("HOME").run()
+    - Assert file contains:
+        filename: output
+        contents: hello
+    - Run command: Command("outputtext").with_env(ENVVAR="harry").with_path(".").run()
+    - Assert file contains:
+        filename: output
+        contents: hello harry
+{% endfor %}

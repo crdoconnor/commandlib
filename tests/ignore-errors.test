@@ -1,17 +1,18 @@
 {% for python_version in python_versions %}
-- name: Run simple command line
+- name: Simple command with environment vars
   preconditions:
     python_version: {{ python_version }}
     scripts:
       outputtext: |
         #!/bin/bash
         echo hello > output
+        exit 1
   tags:
     - py{{ python_version }}
+    - env-vars
+    - path
   scenario:
-    - Assert true: |
-        Command("./outputtext").__repr__() == './outputtext'
-    - Run command: run(Command("./outputtext"))
+    - Run command: Command("./outputtext").ignore_errors().run()
     - Assert file contains:
         filename: output
         contents: hello

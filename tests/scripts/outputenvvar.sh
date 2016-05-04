@@ -1,1 +1,0 @@
-echo $ENVVAR > output.txt

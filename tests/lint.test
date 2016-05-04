@@ -1,0 +1,11 @@
+- name: Lint the code
+  preconditions:
+    python_version: 2.7.8
+    launch_shell: no
+  tags: 
+    - flake8
+  scenario:
+    - flake8:
+        directory: commandlib
+        args:
+          - --max-line-length=100

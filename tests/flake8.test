@@ -1,5 +1,0 @@
-- name: Run flake8
-  tags:
-    - flake8
-  scenario:
-    - Flake8: commandlib
