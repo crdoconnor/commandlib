@@ -80,7 +80,8 @@ class Command(object):
         )
         env_vars["PATH"] = new_path
         for env_var in self._env_drop:
-            del env_vars[env_var]
+            if env_var in env_vars:
+                del env_vars[env_var]
         return env_vars
 
     def ignore_errors(self):

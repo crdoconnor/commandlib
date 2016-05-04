@@ -26,4 +26,8 @@
     - Assert file contains:
         filename: output
         contents: hello harry
+    - Run command: Command("outputtext").without_env("NONEXISTENTVAR").with_path(".").run()
+    - Assert file contains:
+        filename: output
+        contents: hello
 {% endfor %}
