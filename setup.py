@@ -16,7 +16,7 @@ def read(*parts):
 
 setup(name="commandlib",
       version=read('VERSION').replace('\n', ''),
-      description="Command runner for human beings.",
+      description="Pythonic command runner",
       long_description=read('README.rst'),
       classifiers=[
           'Development Status :: 4 - Beta',
