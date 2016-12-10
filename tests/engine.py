@@ -100,7 +100,7 @@ class ExecutionEngine(hitchtest.ExecutionEngine):
         self.services.start_interactive_mode()
         flake8 = self.python_package.cmd.flake8
         try:
-            flake8(str(self.path.project.joinpath(directory)), *args).in_dir(self.path.project)
+            run(flake8(str(self.path.project.joinpath(directory)), *args).in_dir(self.path.project))
         except CommandError:
             raise RuntimeError("flake8 failure")
 

@@ -9,3 +9,4 @@
         directory: commandlib
         args:
           - --max-line-length=100
+          - --exclude=__init__.py

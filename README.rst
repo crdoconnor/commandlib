@@ -13,8 +13,16 @@ and daisy-chain:
 It is somewhat inspired by amoffat's sh, Kenneth Reitz's requests, jaraco's path.py
 and SQLAlchemy.
 
+To install:
 
-Example::
+.. code-block:: sh
+
+    $ pip install commandlib
+
+
+Example:
+
+.. code-block:: python
 
     >>> from commandlib import Command
     >>> ls = Command("ls")
@@ -22,7 +30,10 @@ Example::
     sys  tmp  run  dev  proc  etc  boot  sbin  root  vmlinuz  initrd.img  bin  lib  opt  vmlinuz.old  initrd.img.old  media  home  cdrom  lost+found  var  srv  usr  mnt
 
 
-CommandPath example::
+CommandPath example:
+
+.. code-block:: python
+
 
     >>> from commandlib import CommandPath
     >>> bin = CommandPath("/bin")
@@ -30,32 +41,44 @@ CommandPath example::
     sys  tmp  run  dev  proc  etc  boot  sbin  root  vmlinuz  initrd.img  bin  lib  opt  vmlinuz.old  initrd.img.old  media  home  cdrom  lost+found  var  srv  usr  mnt
 
 
-Install
--------
-
-    pip install commandlib
 
 
 API
 ---
 
+.. code-block:: python
+
     >>> from commandlib import Command, run
+
+    # Create command object
     >>> py = Command("/usr/bin/python")
-    >>> py = py.with_env(PYTHONPATH="/home/user/pythondirectory")    # Run with *additional* environment variable PYTHONPATH (*added* to global environment when command is run)
-    >>> py = py.with_path("/home/user/bin")                          # Run with additional path (appended to existing PATH environment variable when command is run)
-    >>> py = py.in_dir("/home/user/mydir")                           # Run in specified directory.
-    >>> py = py.with_shell()                                         # Run with shell
-    >>> py = py.only_errors()                                        # Suppress stderr
-    >>> py = py.silently()                                           # Suppress stdout and stderr
-    >>> run(py)                                                      # Run command explicitly with all of the above
+
+    # Run with *additional* environment variable PYTHONPATH (*added* to global environment when command is run)
+    >>> py = py.with_env(PYTHONPATH="/home/user/pythondirectory")    
+
+    # Run with additional path (appended to existing PATH environment variable when command is run)
+    >>> py = py.with_path("/home/user/bin")
+
+    # Run in specified directory (default is current directory)
+    >>> py = py.in_dir("/home/user/mydir")
+
+    # Run in shell
+    >>> py = py.with_shell()
+
+    # Suppress stderr
+    >>> py = py.silently() # Suppress stdout and stderr
+
+    # Finally run command explicitly with all of the above
+    >>> run(py)
+    >>> py.run() # alternative syntax
 
 
 Why?
 ----
 
-Commandlib is a library to make it easier to pass around command objects between different
-modules and classes and incrementally modify the command's behavior in a readable way
-- adding environment variables, paths, etc.
+Commandlib is a library to make it easier to pass around immutable (sort of) command objects between different
+modules and classes and incrementally modify the command's behavior in a readable way - adding environment
+variables, paths, etc.
 
 * call, check_call and Popen do not have the friendliest of APIs and code that uses them a lot can get ugly fast.
 * sh does a similar thing but has a lot of magic (e.g. overriding import).
@@ -66,12 +89,16 @@ Advanced API
 
 Add trailing arguments:
 
+.. code-block:: python
+
     >>> from commandlib import Command, run
     >>> manage = Command(["/usr/bin/python", "manage.py"]).with_trailing_arguments("--settings", "local_settings.py").in_dir("projectdir")
     >>> run(manage("runserver"))
     [ Runs "/usr/bin/python manage.py runserver --settings local_settings.py" inside projectdir ]
 
 Dynamically generate command bundles from directories with executables in them:
+
+.. code-block:: python
 
     >>> from commandlib import CommandPath, Command, run
     >>> postgres94 = CommandPath("/usr/lib/postgresql/9.4/bin/")
@@ -82,6 +109,8 @@ Dynamically generate command bundles from directories with executables in them:
     [ Runs createdb ]
 
 Use with path.py (or any other library where str(object) resolves to a string:
+
+.. code-block:: python
 
     >>> from path import Path
     >>> postgres94 = Commands(Path("/usr/lib/postgresql/9.4/bin/"))

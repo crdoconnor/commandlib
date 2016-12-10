@@ -1,0 +1,30 @@
+{% for python_version in python_versions %}
+- name: Pipe to file
+  preconditions:
+    python_version: {{ python_version }}
+    scripts:
+      bin_directory/command1: |
+        #!/bin/bash
+        echo hello $1
+      bin_directory/command2: |
+        #!/bin/bash
+        echo hello $1 1>&2
+  tags:
+    - py{{ python_version }}
+    - command-path
+  scenario:
+    - Run command: from commandlib import CommandPath
+    - Run command: command_path = CommandPath("./bin_directory")
+    - Run command: |
+        with open("regular", "w") as handle:
+            command_path.command1("harry").pipe_stdout_to_file(handle).run()
+
+        with open("error", "w") as handle:
+            command_path.command2("tom").pipe_stderr_to_file(handle).run()
+    - Assert file contains:
+        filename: regular
+        contents: hello harry
+    - Assert file contains:
+        contents: hello tom
+        filename: error
+{% endfor %}
