@@ -1,0 +1,25 @@
+{% for python_version in python_versions %}
+- name: Pipe from file
+  preconditions:
+    python_version: {{ python_version }}
+    scripts:
+      bin_directory/command1: |
+        #!/bin/bash
+        read X
+        echo hello $X > output
+    files:
+      person: harry
+  tags:
+    - py{{ python_version }}
+    - command-path
+  scenario:
+    - Run command: from commandlib import CommandPath
+    - Run command: command_path = CommandPath("./bin_directory")
+    - Run command: |
+        with open("person", "r") as handle:
+            command_path.command1().pipe_from_file(handle).run()
+
+    - Assert file contains:
+        filename: output
+        contents: hello harry
+{% endfor %}

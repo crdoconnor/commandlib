@@ -29,6 +29,12 @@ class ExecutionEngine(hitchtest.ExecutionEngine):
             script_file.write_text(text)
             script_file.chmod("u+x")
 
+        for script, text in self.preconditions.get("files", {}).items():
+            script_file = self.path.state.joinpath(script)
+            if not script_file.dirname().exists():
+                script_file.dirname().mkdir()
+            script_file.write_text(text)
+
         self.python_package = hitchpython.PythonPackage(
             self.preconditions.get('python_version', '3.5.0')
         )

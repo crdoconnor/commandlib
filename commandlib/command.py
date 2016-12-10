@@ -46,6 +46,7 @@ class Command(object):
         self._ignore_errors = False
         self._pipe_stdout_to_file = None
         self._pipe_stderr_to_file = None
+        self.__pipe_from_file = None
 
     @property
     def arguments(self):
@@ -207,6 +208,18 @@ class Command(object):
         new_command._pipe_stderr_to_file = handle
         return new_command
 
+    def pipe_from_file(self, handle):
+        """
+        Pipe the stderr output to file handle 'handle'.
+
+        Example usage::
+          command.pipe_stderr_to_file(open("/tmp/output", 'w'))
+        """
+        assert type(handle) is file
+        new_command = copy.deepcopy(self)
+        new_command._pipe_from_file = handle
+        return new_command
+
     def run(self):
         """Run command and wait until it finishes."""
         _check_directory(self.directory)
@@ -232,12 +245,15 @@ class Command(object):
         if self._silent_stderr:
             stderr = PIPE
 
+        stdin = None if self._pipe_from_file is None else self._pipe_from_file
+
         returncode = call(
             self.arguments,
             env=self.env,
             shell=self._shell,
             stdout=stdout,
             stderr=stderr,
+            stdin=stdin,
         )
 
         chdir(previous_directory)
