@@ -195,7 +195,6 @@ class Command(object):
         new_command._pipe_stdout_to_file = handle
         return new_command
 
-
     def pipe_stderr_to_file(self, handle):
         """
         Pipe the stderr output to file handle 'handle'.
