@@ -2,6 +2,7 @@ from os import chdir, getcwd
 from subprocess import call, PIPE
 from commandlib.utils import _check_directory
 from commandlib.exceptions import CommandError
+import io
 import copy
 import os
 
@@ -46,7 +47,7 @@ class Command(object):
         self._ignore_errors = False
         self._pipe_stdout_to_file = None
         self._pipe_stderr_to_file = None
-        self.__pipe_from_file = None
+        self._pipe_from_file = None
 
     @property
     def arguments(self):
@@ -190,7 +191,6 @@ class Command(object):
         Example usage::
           command.pipe_stdout_to_file(open("/tmp/output", 'w'))
         """
-        assert type(handle) is file
         new_command = copy.deepcopy(self)
         new_command._pipe_stdout_to_file = handle
         return new_command
@@ -202,7 +202,6 @@ class Command(object):
         Example usage::
           command.pipe_stderr_to_file(open("/tmp/output", 'w'))
         """
-        assert type(handle) is file
         new_command = copy.deepcopy(self)
         new_command._pipe_stderr_to_file = handle
         return new_command
@@ -214,7 +213,6 @@ class Command(object):
         Example usage::
           command.pipe_stderr_to_file(open("/tmp/output", 'w'))
         """
-        assert type(handle) is file
         new_command = copy.deepcopy(self)
         new_command._pipe_from_file = handle
         return new_command
