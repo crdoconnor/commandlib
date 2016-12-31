@@ -1,0 +1,20 @@
+{% for python_version in python_versions %}
+- name: Run pexpect
+  preconditions:
+    python_version: {{ python_version }}
+    pexpect_version: 4.2.1
+    scripts:
+      outputtext: |
+        #!/bin/bash
+        echo hello $1
+  tags:
+    - py{{ python_version }}
+    - arguments
+  scenario:
+    - Run command: |
+       from pexpect import EOF
+       process = Command("./outputtext", "mark").pexpect()
+       process.expect("mark")
+       process.expect(EOF)
+       process.close()
+{% endfor %}

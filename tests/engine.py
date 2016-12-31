@@ -50,6 +50,9 @@ class ExecutionEngine(hitchtest.ExecutionEngine):
         run(self.pip("uninstall", "commandlib", "-y").ignore_errors())
         run(self.pip("install", ".").in_dir(self.path.project))
 
+        if "pexpect_version" in self.preconditions:
+            run(self.pip("install", "pexpect=={0}".format(self.preconditions['pexpect_version'])))
+
         self.services = hitchserve.ServiceBundle(
             str(self.path.project),
             startup_timeout=8.0,

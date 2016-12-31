@@ -217,6 +217,35 @@ class Command(object):
         new_command._pipe_from_file = handle
         return new_command
 
+    def pexpect(self):
+        """
+        Run command and return pexpect process object.
+        """
+        import pexpect
+        assert self._pipe_stderr_to_file is None
+        assert self._pipe_stdout_to_file is None
+        assert self._pipe_from_file is None
+        assert self._silent_stdout == False
+        assert self._silent_stderr == False
+        assert self._ignore_errors == False
+
+        _check_directory(self.directory)
+
+        previous_directory = getcwd()
+
+        if self.directory is not None:
+            chdir(self.directory)
+
+        arguments = self.arguments
+
+        return pexpect.spawn(
+            arguments[0],
+            args=arguments[1:],
+            env=self.env
+        )
+
+        chdir(previous_directory)
+
     def run(self):
         """Run command and wait until it finishes."""
         _check_directory(self.directory)
