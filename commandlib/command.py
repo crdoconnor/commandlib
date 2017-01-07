@@ -1,8 +1,7 @@
 from os import chdir, getcwd
-from subprocess import call, PIPE
+from subprocess import call, PIPE, Popen
 from commandlib.utils import _check_directory
 from commandlib.exceptions import CommandError
-import io
 import copy
 import os
 
@@ -225,9 +224,9 @@ class Command(object):
         assert self._pipe_stderr_to_file is None
         assert self._pipe_stdout_to_file is None
         assert self._pipe_from_file is None
-        assert self._silent_stdout == False
-        assert self._silent_stderr == False
-        assert self._ignore_errors == False
+        assert not self._silent_stdout
+        assert not self._silent_stderr
+        assert not self._ignore_errors
 
         _check_directory(self.directory)
 
@@ -289,6 +288,44 @@ class Command(object):
                 self.__repr__(),
                 returncode
             ))
+
+    def output(self):
+        """Run command until it finishes and return stdout as string."""
+        _check_directory(self.directory)
+
+        previous_directory = getcwd()
+
+        if self.directory is not None:
+            chdir(self.directory)
+
+        assert self._pipe_stdout_to_file is None
+
+        process = Popen(
+            self.arguments,
+            stdout=PIPE,
+            stderr=PIPE,
+            stdin=PIPE,
+            shell=self._shell,
+            env=self.env,
+        )
+
+        stdoutput, stderrput = process.communicate()
+
+        if process.returncode != 0 and not self._ignore_errors:
+            raise CommandError(
+                '"{0}" failed (err code {1}), stdout:\n\n{2}\n\nstderr:\n\n{3}'.format(
+                    self.__repr__(),
+                    process.returncode,
+                    stdoutput.decode('utf8'),
+                    stderrput.decode('utf8'),
+                )
+            )
+
+        process = None
+
+        chdir(previous_directory)
+
+        return stdoutput.decode('utf8')
 
     def __str__(self):
         return " ".join(self.arguments)

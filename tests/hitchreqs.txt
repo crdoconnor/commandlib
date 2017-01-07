@@ -10,7 +10,7 @@ flake8==2.5.4
 hitchcli==0.2.6
 hitchpython==0.5.3
 hitchquickstart==0.1.4
-hitchserve==0.5.0
+hitchserve==0.5.1
 hitchsystem==0.1.5
 hitchtest==0.9.9
 humanize==0.5.1

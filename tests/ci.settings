@@ -1,4 +1,6 @@
-# When running in continuous integration, don't stop on first failure
+python_versions:
+  - 2.7.8
+  - 3.5.0
 
-failfast: false
+failfast: true
 pause_on_failure: false

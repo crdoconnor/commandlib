@@ -1,0 +1,21 @@
+{% for python_version in python_versions %}
+- name: Get output from command's stdout
+  preconditions:
+    python_version: {{ python_version }}
+    scripts:
+      outputtext: |
+        #!/bin/bash
+        echo hello
+      raiseerror: |
+        #!/bin/bash
+        echo bad output
+        exit 1
+  tags:
+    - py{{ python_version }}
+  scenario:
+    - Assert True: |
+        Command("./outputtext").output().strip() == "hello"
+    - Assert Exception:
+        command: Command("./raiseerror").output().strip()
+        exception: CommandError
+{% endfor %}
