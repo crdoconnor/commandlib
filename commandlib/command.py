@@ -63,7 +63,7 @@ class Command(object):
         env_vars = os.environ.copy()
         env_vars.update(self._env)
         new_path = ":".join(
-            [env_vars["PATH"], ] + self._paths if "PATH" in env_vars else [] + self._paths
+            self._paths + [env_vars["PATH"], ] if "PATH" in env_vars else [] + self._paths
         )
         env_vars["PATH"] = new_path
         for env_var in self._env_drop:

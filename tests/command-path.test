@@ -3,9 +3,12 @@
   preconditions:
     python_version: {{ python_version }}
     scripts:
-      bin_directory/command1: |
+      bin_directory/ls: |
         #!/bin/bash
         echo hello $1 > output
+      bin_directory/command1: |
+        #!/bin/bash
+        ls $1
       bin_directory/command2: |
         #!/bin/bash
         echo hello $1 > output
