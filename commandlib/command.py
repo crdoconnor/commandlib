@@ -4,6 +4,7 @@ from commandlib.utils import _check_directory
 from commandlib.exceptions import CommandError
 import copy
 import os
+import sys
 
 
 def _type_check_command(command):
@@ -335,3 +336,6 @@ class Command(object):
 
     def __repr__(self):
         return self.__str__()
+
+
+python = Command(sys.executable)
