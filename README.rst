@@ -113,7 +113,7 @@ Use with path.py (or any other library where str(object) resolves to a string:
 .. code-block:: python
 
     >>> from path import Path
-    >>> postgres94 = Commands(Path("/usr/lib/postgresql/9.4/bin/"))
+    >>> postgres94 = CommandPath(Path("/usr/lib/postgresql/9.4/bin/"))
     >>> run(postgres94.postgres)
 
 
