@@ -1,7 +1,7 @@
 from os import chdir, getcwd
 from subprocess import call, PIPE, Popen
 from commandlib.utils import _check_directory
-from commandlib.exceptions import CommandError
+from commandlib.exceptions import CommandError, CommandExitError
 import copy
 import os
 import sys
@@ -313,13 +313,11 @@ class Command(object):
         stdoutput, stderrput = process.communicate()
 
         if process.returncode != 0 and not self._ignore_errors:
-            raise CommandError(
-                '"{0}" failed (err code {1}), stdout:\n\n{2}\n\nstderr:\n\n{3}'.format(
-                    self.__repr__(),
-                    process.returncode,
-                    stdoutput.decode('utf8'),
-                    stderrput.decode('utf8'),
-                )
+            raise CommandExitError(
+                self.__repr__(),
+                process.returncode,
+                stdoutput.decode('utf8'),
+                stderrput.decode('utf8'),
             )
 
         process = None

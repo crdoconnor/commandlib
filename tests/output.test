@@ -17,5 +17,5 @@
         Command("./outputtext").output().strip() == "hello"
     - Assert Exception:
         command: Command("./raiseerror").output().strip()
-        exception: CommandError
+        exception: CommandExitError
 {% endfor %}
