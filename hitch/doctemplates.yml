@@ -1,0 +1,38 @@
+document: |
+  {{ story.name }}
+  {{ "-" * story.name|length }}
+
+  {{ story.info['description'] }}
+  
+  Example yaml_snippet:
+  
+  .. code-block:: yaml
+  
+      {{ story.preconditions['yaml_snippet']|indent(4) }}
+  
+  .. code-block:: python
+  
+      {{ story.preconditions['setup']|indent(4) }}
+
+  {% for variation in story.variations %}
+  
+  {{ variation.child_name }}
+  {{ "-" * variation.child_name|length }}
+  
+  .. code-block:: python
+  
+      {{ variation.steps[0].arguments.yaml['code'].data|indent(4) }}
+      
+  {% if 'will output' in variation.steps[0].arguments.yaml %}
+  .. code-block:: yaml
+
+      {{ variation.steps[0].arguments.yaml['will output'].data|indent(4) }}
+  {% endif %}
+  {% if 'raises' in variation.steps[0].arguments.yaml %}
+  {{ variation.steps[0].arguments.yaml['raises']['message'].data }}
+  {% endif %}
+  {% endfor %}
+
+  Page automatically generated from executable user story:
+    https://github.com/crdoconnor/strictyaml/blob/master/hitch/{{ story.filename.basename() }}
+

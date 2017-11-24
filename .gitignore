@@ -2,7 +2,7 @@ build/
 dist/
 .cache
 commandlib.egg-info/
-tests/.hitch
 __pycache__
 *.pyc
 *.kate-swp
+hitch/gen
