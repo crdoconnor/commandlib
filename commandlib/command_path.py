@@ -1,7 +1,8 @@
-from os.path import join, isfile, exists, abspath
+from os.path import join, isfile, exists, abspath, dirname
 from os import listdir, access
 from commandlib.exceptions import CommandError
 from commandlib.command import Command
+import sys
 import os
 
 
@@ -47,3 +48,6 @@ class CommandPath(object):
             return commands[name]
         else:
             raise CommandError("'{0}' not found in '{1}'".format(name, self._directory))
+
+
+python_bin = CommandPath(dirname(abspath(sys.executable)))
