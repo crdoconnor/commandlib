@@ -1,4 +1,4 @@
-* repr should contain extra environment variables.
+* as_bash_command -- include environment variables.
 
 * Fix bug caused by copy.copy() being unable to copy file handles.
 * Throw exceptions on invalid states (e.g. using silent_stdout and pipe_to_file at same time).
