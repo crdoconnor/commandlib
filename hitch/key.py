@@ -1,4 +1,4 @@
-from commandlib import run, CommandError
+from commandlib import run
 import hitchpython
 from hitchstory import StoryCollection, StorySchema, BaseEngine, HitchStoryException
 from hitchstory import validate, expected_exception
@@ -12,7 +12,6 @@ from commandlib import python
 from hitchrun import DIR
 from hitchrun.decorators import ignore_ctrlc
 from hitchrunpy import ExamplePythonCode, HitchRunPyException, ExpectedExceptionMessageWasDifferent
-import requests
 from templex import Templex, NonMatching
 
 
