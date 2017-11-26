@@ -1,5 +1,5 @@
 hitchpython
-hitchstory
+hitchstory>=0.7.4
 hitchrunpy
 hitchrun
 hitchdoc

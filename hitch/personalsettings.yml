@@ -1,5 +1,0 @@
-engine:
-  rewrite: yes
-  cprofile: no
-params:
-  python version: 2.7.10

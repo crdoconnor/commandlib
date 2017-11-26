@@ -23,6 +23,7 @@ class Engine(BaseEngine):
             Optional("scripts"): MapPattern(Str(), Str()),
             Optional("python version"): Str(),
             Optional("pexpect version"): Str(),
+            Optional("icommandlib version"): Str(),
             Optional("setup"): Str(),
             Optional("files"): MapPattern(Str(), Str()),
             Optional("code"): Str(),
@@ -31,6 +32,7 @@ class Engine(BaseEngine):
             Optional("description"): Str(),
             Optional("importance"): Int(),
             Optional("docs"): Str(),
+            Optional("fails on python 2"): Bool(),
         },
     )
 
@@ -239,7 +241,9 @@ def regression():
     """
     storybook = _storybook({}).only_uninherited()
     print(
-        storybook.with_params(**{"python version": "2.7.10"}).ordered_by_name().play().report()
+        storybook.with_params(**{"python version": "2.7.10"})
+                 .filter(lambda story: not story.info['fails on python 2'])
+                 .ordered_by_name().play().report()
     )
     print(
         storybook.with_params(**{"python version": "3.5.0"}).ordered_by_name().play().report()

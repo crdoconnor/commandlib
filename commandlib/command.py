@@ -229,9 +229,20 @@ class Command(object):
         new_command._pipe_from_string = string
         return new_command
 
+    def interact(self):
+        """
+        Return icommand object which you can then run.
+
+        NOTE: Requires you to pip install 'icommandlib' or will fail.
+        """
+        import icommandlib
+        return icommandlib.ICommand(self)
+
     def pexpect(self):
         """
         Run command and return pexpect process object.
+
+        NOTE: Requires you to pip install 'pexpect' or will fail.
         """
         import pexpect
         assert self._pipe_stderr_to_file is None
