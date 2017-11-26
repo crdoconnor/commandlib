@@ -279,7 +279,7 @@ def deploy(version):
     """
     Deploy to pypi as specified version.
     """
-    NAME = "strictyaml"
+    NAME = "commandlib"
     git = Command("git").in_dir(DIR.project)
     version_file = DIR.project.joinpath("VERSION")
     old_version = version_file.bytes().decode('utf8')
@@ -311,13 +311,6 @@ def deploy(version):
     ).in_dir(DIR.project).run()
 
 
-@expected(CommandError)
-def doctest(version="3.5.0"):
-    Command(DIR.gen.joinpath("py{0}".format(version), "bin", "python"))(
-        "-m", "doctest", "-v", DIR.project.joinpath("strictyaml", "utils.py")
-    ).in_dir(DIR.project.joinpath("strictyaml")).run()
-
-
 @ignore_ctrlc
 def ipy():
     """
@@ -342,22 +335,3 @@ def rerun(version="3.5.0"):
     Command(DIR.gen.joinpath("py{0}".format(version), "bin", "python"))(
         DIR.gen.joinpath("state", "examplepythoncode.py")
     ).in_dir(DIR.gen.joinpath("state")).run()
-
-
-def rot():
-    """
-    Test for code rot by upgrading dependency and running tests (ruamel.yaml).
-    """
-    print("Checking code rot for strictyaml project...")
-    latest_version = requests.get(
-        "https://pypi.python.org/pypi/ruamel.yaml/json"
-    ).json()['info']['version']
-    base_story = load(DIR.key.joinpath("strictyaml.story").bytes().decode("utf8"))
-    latest_tested_version = str(base_story['strictyaml']['params']['ruamel version'])
-
-    if latest_version != latest_tested_version:
-        base_story['strictyaml']['params']['ruamel version'] = load(latest_version)
-        DIR.key.joinpath("strictyaml.story").write_text(base_story.as_yaml())
-        regression()
-    else:
-        print("No dependency changes")
