@@ -1,19 +1,6 @@
-* as_bash_command -- include environment variables.
-
-* Fix bug caused by copy.copy() being unable to copy file handles.
-* Throw exceptions on invalid states (e.g. using silent_stdout and pipe_to_file at same time).
-* Pipe string into stdin.
-
-pipe(Stdin(filename="x"), Stdout)
-
-ICommandlib - SIGINT
-ICommadnlib - SIGTERM inhibit
-ICommandlib - timeout exception should print the screenshot.
-
-ICommandlib - take screenshot of closed process should return final screenshot.
-
-Timeout should be canceled when waiting for something - unless it is specified that it shouldn't be canceled.
-
-
-ICommandlib - killing sometimes leaves the thread active.
-
+- .piped().output() -- returns output object with stderr and stdout and functioning "in"
+- .piped().from_stdin()
+- as_bash_command -- include environment variables and print correctly.
+- Fix bug caused by copy.copy() being unable to copy file handles.
+- Throw exceptions on invalid states (e.g. using silent_stdout and pipe_to_file at same time).
+- Pipe string into stdin.
