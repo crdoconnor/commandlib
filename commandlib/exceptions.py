@@ -4,18 +4,16 @@ class CommandError(Exception):
 
 
 class CommandExitError(CommandError):
-    def __init__(self, command_repr, return_code, stdout=None, stderr=None):
+    def __init__(self, command_repr, return_code, output=None):
         self.command_repr = command_repr
         self.return_code = return_code
-        self.stdout = stdout
-        self.stderr = stderr
+        self.output = output
 
     def __unicode__(self):
-        return '"{0}" failed (err code {1}), stdout:\n\n{2}\n\nstderr:\n\n{3}'.format(
+        return '"{0}" failed (err code {1}), output:\n\n{2}'.format(
             self.command_repr,
             self.return_code,
-            self.stdout,
-            self.stderr,
+            self.output,
         )
 
     def __str__(self):

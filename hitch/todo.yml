@@ -1,6 +1,4 @@
-- .piped().output() -- returns output object with stderr and stdout and functioning "in"
-- .piped().from_stdin()
-- as_bash_command -- include environment variables and print correctly.
-- Fix bug caused by copy.copy() being unable to copy file handles.
-- Throw exceptions on invalid states (e.g. using silent_stdout and pipe_to_file at same time).
-- Pipe string into stdin.
+- .to_file() -- combined stdout and stderr and pipe to file.
+- .to_handle() -- combined stdout and sterr and pipe to file handle.
+- Refactor change directory to use a context manager.
+- .as_bash_command() - prepend command with bash -c ? What does 'shell' do? Bash environment vars?
