@@ -16,7 +16,7 @@ Pipe in:
       steps:
       - Run: |
           with open("person", "r") as handle:
-              command_path.command1().pipe_from_file(handle).run()
+              command_path.command1().piped.from_handle(handle).run()
 
       - File contents will be:
           filename: output
@@ -26,7 +26,7 @@ Pipe in:
       steps:
       - Run: |
           with open("person", "r") as handle:
-              command_path.command1().pipe_from_string("harry").run()
+              command_path.command1().piped.from_string("harry").run()
 
       - File contents will be:
           filename: output
@@ -51,7 +51,7 @@ Pipe out:
       steps:
       - Run: |
           with open("regular", "w") as handle:
-              command_path.command1("harry").pipe_stdout_to_file(handle).run()
+              command_path.command1("harry").piped.stdout_to_handle(handle).run()
 
       - File contents will be:
           filename: regular
@@ -61,7 +61,7 @@ Pipe out:
       steps:
       - Run: |
           with open("error", "w") as handle:
-              command_path.command2("tom").pipe_stderr_to_file(handle).run()
+              command_path.command2("tom").piped.stderr_to_handle(handle).run()
 
       - File contents will be:
           filename: error

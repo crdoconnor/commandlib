@@ -202,7 +202,7 @@ def _personal_settings():
 
 
 @expected(HitchStoryException)
-def tdd(*keywords):
+def bdd(*keywords):
     """
     Run tests matching keywords.
     """

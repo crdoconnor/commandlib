@@ -1,5 +1,6 @@
 from commandlib.exceptions import CommandError, CommandExitError
 from commandlib.utils import _check_directory
+from commandlib.piped import PipedCommand
 from subprocess import PIPE, Popen
 from os import chdir, getcwd
 import copy
@@ -237,6 +238,20 @@ class Command(object):
         """
         import icommandlib
         return icommandlib.ICommand(self)
+
+    @property
+    def piped(self):
+        """
+        Return PipedCommand object.
+
+        This is what you use if you want to do limited piped
+        interactions with the command:
+
+        * Pipe a file handle in or out of the command.
+        * Pipe in a string.
+        * Run and get the output of the command.
+        """
+        return PipedCommand(self)
 
     def pexpect(self):
         """
