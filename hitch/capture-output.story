@@ -27,13 +27,13 @@ Capture output:
     Success:
       steps:
       - Run: |
-          assert Command("./outputtext").piped.output().strip() \
+          assert Command("./outputtext").output().strip() \
             == "hello from stdout\nhello from stderr"
 
     Error:
       steps:
       - Run:
-          code: Command("./raiseerror").piped.output().strip()
+          code: Command("./raiseerror").output().strip()
           raises:
             type: commandlib.exceptions.CommandExitError
             message: |-

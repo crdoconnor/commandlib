@@ -1,4 +1,4 @@
-from commandlib.exceptions import CommandError, CommandExitError
+from commandlib.exceptions import CommandError
 from commandlib.utils import _check_directory
 from commandlib.piped import PipedCommand
 from subprocess import PIPE, Popen
@@ -342,40 +342,8 @@ class Command(object):
             ))
 
     def output(self):
-        """Run command until it finishes and return stdout as string."""
-        _check_directory(self.directory)
-
-        previous_directory = getcwd()
-
-        if self.directory is not None:
-            chdir(self.directory)
-
-        assert self._pipe_stdout_to_file is None
-
-        process = Popen(
-            self.arguments,
-            stdout=PIPE,
-            stderr=PIPE,
-            stdin=PIPE,
-            shell=self._shell,
-            env=self.env,
-        )
-
-        stdoutput, stderrput = process.communicate()
-
-        if process.returncode != 0 and not self._ignore_errors:
-            raise CommandExitError(
-                self.__repr__(),
-                process.returncode,
-                stdoutput.decode('utf8'),
-                stderrput.decode('utf8'),
-            )
-
-        process = None
-
-        chdir(previous_directory)
-
-        return stdoutput.decode('utf8')
+        """Run command until it finishes and return output as string."""
+        return self.piped.output()
 
     def __str__(self):
         return " ".join(self.arguments)
