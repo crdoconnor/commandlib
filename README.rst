@@ -92,7 +92,7 @@ Add trailing arguments:
 .. code-block:: python
 
     >>> from commandlib import Command, run
-    >>> manage = Command(["/usr/bin/python", "manage.py"]).with_trailing_arguments("--settings", "local_settings.py").in_dir("projectdir")
+    >>> manage = Command("/usr/bin/python", "manage.py").with_trailing_arguments("--settings", "local_settings.py").in_dir("projectdir")
     >>> run(manage("runserver"))
     [ Runs "/usr/bin/python manage.py runserver --settings local_settings.py" inside projectdir ]
 
@@ -115,15 +115,3 @@ Use with path.py (or any other library where str(object) resolves to a string:
     >>> from path import Path
     >>> postgres94 = CommandPath(Path("/usr/lib/postgresql/9.4/bin/"))
     >>> run(postgres94.postgres)
-
-
-Hacking
--------
-
-If you want to hack, you can TDD with::
-
-    curl https://raw.githubusercontent.com/mitsuhiko/pipsi/master/get-pipsi.py | python
-    pipsi install hitch
-    cd tests
-    hitch init
-    hitch test . --settings tdd.settings

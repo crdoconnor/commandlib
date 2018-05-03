@@ -1,3 +1,4 @@
+- add assertion to make sure that a list of arguments raises a meaningful TypeError.
 - .to_file() -- combined stdout and stderr and pipe to file.
 - .to_handle() -- combined stdout and sterr and pipe to file handle.
 - Refactor change directory to use a context manager.
