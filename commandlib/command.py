@@ -269,20 +269,14 @@ class Command(object):
 
         _check_directory(self.directory)
 
-        previous_directory = getcwd()
-
-        if self.directory is not None:
-            chdir(self.directory)
-
         arguments = self.arguments
 
         return pexpect.spawn(
             arguments[0],
             args=arguments[1:],
-            env=self.env
+            env=self.env,
+            cwd=self.directory,
         )
-
-        chdir(previous_directory)
 
     def run(self):
         """Run command and wait until it finishes."""
