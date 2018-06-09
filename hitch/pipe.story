@@ -12,7 +12,17 @@ Pipe in:
       from commandlib import CommandPath
       command_path = CommandPath("./bin_directory")
   variations:
-    from file:
+    from string:
+      steps:
+      - Run: |
+          with open("person", "r") as handle:
+              command_path.command1().piped.from_string("harry").run()
+
+      - File contents will be:
+          filename: output
+          contents: hello harry
+          
+    from file handle:
       steps:
       - Run: |
           with open("person", "r") as handle:
@@ -22,11 +32,10 @@ Pipe in:
           filename: output
           contents: hello harry
     
-    from string:
+    from filename:
       steps:
       - Run: |
-          with open("person", "r") as handle:
-              command_path.command1().piped.from_string("harry").run()
+          command_path.command1().piped.from_filename("person").run()
 
       - File contents will be:
           filename: output
@@ -47,7 +56,7 @@ Pipe out:
       from commandlib import CommandPath
       command_path = CommandPath("./bin_directory")
   variations:
-    stdout to file:
+    stdout to file handle:
       steps:
       - Run: |
           with open("regular", "w") as handle:
@@ -56,8 +65,17 @@ Pipe out:
       - File contents will be:
           filename: regular
           contents: hello harry
+
+    stdout to filename:
+      steps:
+      - Run: |
+          command_path.command1("harry").piped.stdout_to_filename("regular").run()
+
+      - File contents will be:
+          filename: regular
+          contents: hello harry
           
-    stderr to file:
+    stderr to file handle:
       steps:
       - Run: |
           with open("error", "w") as handle:

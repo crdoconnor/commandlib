@@ -10,19 +10,35 @@ class PipedCommand(object):
         self._command = command
         self._from_string = None
         self._from_handle = None
+        self._from_filename = None
+        self._stdout_to_filename = None
         self._stdout_to_handle = None
         self._stderr_to_handle = None
 
     def from_string(self, string):
         assert self._from_handle is None
+        assert self._from_filename is None
         new_piped = deepcopy(self)
         new_piped._from_string = string
         return new_piped
 
     def from_handle(self, handle):
         assert self._from_string is None
+        assert self._from_filename is None
         new_piped = deepcopy(self)
         new_piped._from_handle = handle
+        return new_piped
+
+    def from_filename(self, filename):
+        assert self._from_string is None
+        assert self._from_handle is None
+        new_piped = deepcopy(self)
+        new_piped._from_filename = str(filename)
+        return new_piped
+
+    def stdout_to_filename(self, filename):
+        new_piped = deepcopy(self)
+        new_piped._stdout_to_filename = filename
         return new_piped
 
     def stdout_to_handle(self, handle):
@@ -41,19 +57,23 @@ class PipedCommand(object):
 
         previous_directory = getcwd()
 
-        if self._from_handle is None and self._from_string is None:
+        if self._from_handle is None and self._from_string is None and self._from_filename is None:
             stdin = None
         else:
             if self._from_string:
                 stdin = PIPE
             if self._from_handle:
                 stdin = self._from_handle
+            if self._from_filename:
+                stdin = open(self._from_filename, 'r')
 
-        if self._stdout_to_handle is None:
+        if self._stdout_to_handle is None and self._stdout_to_filename is None:
             stdout = None
         else:
             if self._stdout_to_handle:
                 stdout = self._stdout_to_handle
+            if self._stdout_to_filename:
+                stdout = open(self._stdout_to_filename, 'w')
 
         if self._stderr_to_handle is None:
             stderr = PIPE
@@ -64,23 +84,31 @@ class PipedCommand(object):
         if self._command.directory is not None:
             chdir(self._command.directory)
 
-        process = Popen(
-            self._command.arguments,
-            stdout=stdout,
-            stderr=stderr,
-            stdin=stdin,
-            shell=self._command._shell,
-            env=self._command.env,
-        )
+        try:
+            process = Popen(
+                self._command.arguments,
+                stdout=stdout,
+                stderr=stderr,
+                stdin=stdin,
+                shell=self._command._shell,
+                env=self._command.env,
+            )
 
-        if self._from_string:
-            process.stdin.write(self._from_string.encode('utf8'))
+            if self._from_string:
+                process.stdin.write(self._from_string.encode('utf8'))
 
-        _, _ = process.communicate()
+            _, _ = process.communicate()
 
-        returncode = process.returncode
+            returncode = process.returncode
 
-        chdir(previous_directory)
+        finally:
+            if self._from_filename:
+                stdin.close()
+
+            if self._stdout_to_filename:
+                stdout.close()
+
+            chdir(previous_directory)
 
         if returncode != 0 and not self._command._ignore_errors:
             raise CommandError('"{0}" failed (err code {1})'.format(
