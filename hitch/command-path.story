@@ -1,6 +1,6 @@
 Command Path:
   based on: commandlib
-  description: |
+  about: |
     A CommandPath is an object that you can create to represent
     a directory with executables in it. You can then use that object
     to get command objects which you can then run.

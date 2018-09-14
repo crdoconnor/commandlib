@@ -1,5 +1,5 @@
 Use current python environment:
-  description: |
+  about: |
     You can run python code in the same environment
     by importing "python" command object or the
     "python_bin" command path.

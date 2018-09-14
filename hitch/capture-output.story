@@ -1,6 +1,6 @@
 Capture output:
   based on: commandlib
-  description: |
+  about: |
     You can run a command and capture the stdout and stderr to a string
     using .output().
 

@@ -1,5 +1,5 @@
 Run interactively:
-  description: |
+  about: |
     Commandlib is a small, self-contained library for running
     commands in the current terminal.
     
@@ -36,10 +36,10 @@ Run interactively:
       from commandlib import Command
   variations:
     icommandlib:
-      description: |
+      about: |
         NOTE: You need to "pip install icommandlib" to use this command
         or you will get an import error.
-      fails on python 2: yes
+      fails_on_python_2: yes
       given:
         icommandlib version: 0.1.2
       steps:
@@ -49,7 +49,7 @@ Run interactively:
           process.wait_for_successful_exit()
 
     pexpect:
-      description: |
+      about: |
         NOTE: You need to "pip install pexpect" to use this command
         or you will get an import error.
       given:

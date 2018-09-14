@@ -1,7 +1,7 @@
 from commandlib import run
 import hitchpython
-from hitchstory import StoryCollection, StorySchema, BaseEngine, HitchStoryException
-from hitchstory import validate, expected_exception
+from hitchstory import StoryCollection, BaseEngine, no_stacktrace_for, validate, HitchStoryException
+from hitchstory import GivenDefinition, GivenProperty, InfoDefinition, InfoProperty
 from hitchrun import expected
 from commandlib import Command
 from strictyaml import Str, Map, MapPattern, Int, Bool, Optional, load
@@ -17,22 +17,20 @@ from templex import Templex, NonMatching
 
 class Engine(BaseEngine):
     """Python engine for running tests."""
-    schema = StorySchema(
-        given={
-            Optional("scripts"): MapPattern(Str(), Str()),
-            Optional("python version"): Str(),
-            Optional("pexpect version"): Str(),
-            Optional("icommandlib version"): Str(),
-            Optional("setup"): Str(),
-            Optional("files"): MapPattern(Str(), Str()),
-            Optional("code"): Str(),
-        },
-        info={
-            Optional("description"): Str(),
-            Optional("importance"): Int(),
-            Optional("docs"): Str(),
-            Optional("fails on python 2"): Bool(),
-        },
+    given_definition = GivenDefinition(
+        scripts=GivenProperty(MapPattern(Str(), Str())),
+        python_version=GivenProperty(Str()),
+        pexpect_version=GivenProperty(Str()),
+        icommandlib_version=GivenProperty(Str()),
+        setup=GivenProperty(Str()),
+        files=GivenProperty(MapPattern(Str(), Str())),
+        code=GivenProperty(Str()),
+    )
+
+    info_definition = InfoDefinition(
+        importance=InfoProperty(schema=Int()),
+        docs=InfoProperty(schema=Str()),
+        fails_on_python_2=InfoProperty(schema=Bool()),
     )
 
     def __init__(self, keypath, settings):
@@ -83,8 +81,8 @@ class Engine(BaseEngine):
             .with_code(self.given.get('code', ''))\
             .with_setup_code(self.given.get('setup', ''))
 
-    @expected_exception(NonMatching)
-    @expected_exception(HitchRunPyException)
+    @no_stacktrace_for(NonMatching)
+    @no_stacktrace_for(HitchRunPyException)
     @validate(
         code=Str(),
         will_output=Str(),
@@ -239,14 +237,10 @@ def regression():
     Run regression testing - lint and then run all tests.
     """
     storybook = _storybook({}).only_uninherited()
-    print(
-        storybook.with_params(**{"python version": "2.7.10"})
-                 .filter(lambda story: not story.info['fails on python 2'])
-                 .ordered_by_name().play().report()
-    )
-    print(
-        storybook.with_params(**{"python version": "3.5.0"}).ordered_by_name().play().report()
-    )
+    storybook.with_params(**{"python version": "2.7.10"})\
+             .filter(lambda story: not story.info.get('fails on python 2', False))\
+             .ordered_by_name().play().report()
+    storybook.with_params(**{"python version": "3.5.0"}).ordered_by_name().play().report()
     lint()
 
 
