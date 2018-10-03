@@ -1,18 +1,15 @@
-from commandlib import run
-import hitchpython
 from hitchstory import StoryCollection, BaseEngine, no_stacktrace_for, validate, HitchStoryException
 from hitchstory import GivenDefinition, GivenProperty, InfoDefinition, InfoProperty
 from hitchrun import expected
 from commandlib import Command
 from strictyaml import Str, Map, MapPattern, Int, Bool, Optional, load
-from pathquery import pathq
-import hitchtest
-from hitchrun import hitch_maintenance
+from pathquery import pathquery
 from commandlib import python
 from hitchrun import DIR
 from hitchrun.decorators import ignore_ctrlc
-from hitchrunpy import ExamplePythonCode, HitchRunPyException, ExpectedExceptionMessageWasDifferent
-from templex import Templex, NonMatching
+from hitchrunpy import ExamplePythonCode, HitchRunPyException
+from templex import Templex
+import hitchpylibrarytoolkit
 
 
 class Engine(BaseEngine):
@@ -33,9 +30,10 @@ class Engine(BaseEngine):
         fails_on_python_2=InfoProperty(schema=Bool()),
     )
 
-    def __init__(self, keypath, settings):
+    def __init__(self, keypath, rewrite=False):
         self.path = keypath
-        self.settings = settings
+        self._rewrite = rewrite
+        self._cprofile = False
 
     def set_up(self):
         """Set up your applications and the test environment."""
@@ -56,32 +54,20 @@ class Engine(BaseEngine):
         for filename, contents in self.given.get("files", {}).items():
             self.path.state.joinpath(filename).write_text(contents)
 
-        self.python_package = hitchpython.PythonPackage(
-            self.given['python version']
-        )
-        self.python_package.build()
-
-        self.pip = self.python_package.cmd.pip
-        self.python = self.python_package.cmd.python
-
-        # Install debugging packages
-        with hitchtest.monitor([self.path.key.joinpath("debugrequirements.txt")]) as changed:
-            if changed:
-                run(self.pip("install", "-r", "debugrequirements.txt").in_dir(self.path.key))
-
-        # Uninstall and reinstall
-        with hitchtest.monitor(
-            pathq(self.path.project.joinpath("commandlib")).ext("py")
-        ) as changed:
-            if changed:
-                run(self.pip("uninstall", "commandlib", "-y").ignore_errors())
-                run(self.pip("install", ".").in_dir(self.path.project))
+        self.python = hitchpylibrarytoolkit.project_build(
+            "commandlib",
+            self.path,
+            self.given["python version"],
+        ).bin.python
 
         self.example_py_code = ExamplePythonCode(self.python, self.path.state)\
             .with_code(self.given.get('code', ''))\
             .with_setup_code(self.given.get('setup', ''))
 
-    @no_stacktrace_for(NonMatching)
+    def _story_friendly_output(self, text):
+        return text.replace(self.path.state, "/path/to")
+
+    @no_stacktrace_for(AssertionError)
     @no_stacktrace_for(HitchRunPyException)
     @validate(
         code=Str(),
@@ -94,7 +80,7 @@ class Engine(BaseEngine):
     def run(self, code, will_output=None, raises=None):
         to_run = self.example_py_code.with_code(code)
 
-        if self.settings.get("cprofile"):
+        if self._cprofile:
             to_run = to_run.with_cprofile(
                 self.path.profile.joinpath("{0}.dat".format(self.story.slug))
             )
@@ -105,8 +91,8 @@ class Engine(BaseEngine):
             actual_output = '\n'.join([line.rstrip() for line in result.output.split("\n")])
             try:
                 Templex(will_output).assert_match(actual_output)
-            except NonMatching:
-                if self.settings.get("rewrite"):
+            except AssertionError:
+                if self._rewrite:
                     self.current_step.update(**{"will output": actual_output})
                 else:
                     raise
@@ -132,11 +118,13 @@ class Engine(BaseEngine):
 
             try:
                 result = self.example_py_code.expect_exceptions().run()
-                result.exception_was_raised(exception_type, message)
-            except ExpectedExceptionMessageWasDifferent as error:
-                if self.settings.get("rewrite") and not differential:
+                result.exception_was_raised(exception_type)
+                exception_message = self._story_friendly_output(result.exception.message)
+                Templex(exception_message).assert_match(message)
+            except AssertionError:
+                if self._rewrite and not differential:
                     new_raises = raises.copy()
-                    new_raises['message'] = result.exception.message
+                    new_raises['message'] = self._story_friendly_output(result.exception.message)
                     self.current_step.update(raises=new_raises)
                 else:
                     raise
@@ -150,8 +138,8 @@ class Engine(BaseEngine):
             # Templex(file_contents).assert_match(contents.strip())
             assert file_contents == contents.strip(), \
                 "{0} not {1}".format(file_contents, contents.strip())
-        except NonMatching:
-            if self.settings.get("rewrite"):
+        except AssertionError:
+            if self._rewrite:
                 self.current_step.update(contents=file_contents)
             else:
                 raise
@@ -161,17 +149,15 @@ class Engine(BaseEngine):
         IPython.embed()
 
     def on_success(self):
-        if self.settings.get("rewrite"):
-            self.new_story.save()
-        if self.settings.get("cprofile"):
+        if self._cprofile:
             self.python(
                 self.path.key.joinpath("printstats.py"),
                 self.path.profile.joinpath("{0}.dat".format(self.story.slug))
             ).run()
 
 
-def _storybook(settings):
-    return StoryCollection(pathq(DIR.key).ext("story"), Engine(DIR, settings))
+def _storybook(**kwargs):
+    return StoryCollection(pathquery(DIR.key).ext("story"), Engine(DIR, **kwargs))
 
 
 def _personal_settings():
@@ -183,7 +169,7 @@ def _personal_settings():
             "  rewrite: no\n"
             "  cprofile: no\n"
             "params:\n"
-            "  python version: 3.5.0\n"
+            "  python version: 3.7.0n"
         ))
     return load(
         settings_file.bytes().decode('utf8'),
@@ -205,12 +191,22 @@ def bdd(*keywords):
     Run tests matching keywords.
     """
     settings = _personal_settings().data
-    print(
-        _storybook(settings['engine'])
-        .with_params(**{"python version": settings['params']['python version']})
-        .only_uninherited()
-        .shortcut(*keywords).play().report()
-    )
+    _storybook()\
+        .with_params(**{"python version": settings['params']['python version']})\
+        .only_uninherited()\
+        .shortcut(*keywords).play()
+
+
+@expected(HitchStoryException)
+def rbdd(*keywords):
+    """
+    Run tests matching keywords and rewrite test if output changed.
+    """
+    settings = _personal_settings().data
+    _storybook(rewrite=True)\
+        .with_params(**{"python version": settings['params']['python version']})\
+        .only_uninherited()\
+        .shortcut(*keywords).play()
 
 
 @expected(HitchStoryException)
@@ -220,15 +216,11 @@ def regressfile(filename):
 
     Rewrite stories if appropriate.
     """
-    print(
-        _storybook({"rewrite": False}).in_filename(filename)
-                                      .with_params(**{"python version": "2.7.10"})
-                                      .ordered_by_name().play().report()
-    )
-    print(
-        _storybook({"rewrite": False}).with_params(**{"python version": "3.5.0"})
-                                      .in_filename(filename).ordered_by_name().play().report()
-    )
+    _storybook().in_filename(filename)\
+                .with_params(**{"python version": "2.7.14"})\
+                .ordered_by_name().play()
+    _storybook().with_params(**{"python version": "3.7.0"})\
+                .in_filename(filename).ordered_by_name().play()
 
 
 @expected(HitchStoryException)
@@ -236,11 +228,11 @@ def regression():
     """
     Run regression testing - lint and then run all tests.
     """
-    storybook = _storybook({}).only_uninherited()
-    storybook.with_params(**{"python version": "2.7.10"})\
+    storybook = _storybook().only_uninherited()
+    storybook.with_params(**{"python version": "2.7.14"})\
              .filter(lambda story: not story.info.get('fails on python 2', False))\
              .ordered_by_name().play().report()
-    storybook.with_params(**{"python version": "3.5.0"}).ordered_by_name().play().report()
+    storybook.with_params(**{"python version": "3.7.0"}).ordered_by_name().play().report()
     lint()
 
 
@@ -259,13 +251,6 @@ def lint():
         "--exclude=__init__.py",
     ).run()
     print("Lint success!")
-
-
-def hitch(*args):
-    """
-    Use 'h hitch --help' to get help on these commands.
-    """
-    hitch_maintenance(*args)
 
 
 def deploy(version):

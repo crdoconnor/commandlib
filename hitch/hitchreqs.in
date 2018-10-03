@@ -1,12 +1,2 @@
-hitchpython
-hitchstory>=0.11.1
-hitchrunpy
 hitchrun
-hitchdoc
-templex
-flake8
-jupyter_console
-twine
-simex
-q
-icommandlib
+hitchpylibrarytoolkit>=0.1.9

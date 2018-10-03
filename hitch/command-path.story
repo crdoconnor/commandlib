@@ -64,4 +64,4 @@ Command Path:
           code: command_path.non_existent_command
           raises:
             type: commandlib.exceptions.CommandError
-            message: "'non_existent_command' not found in '/home/colm/.hitch/qqxe6h/state/bin_directory'"
+            message: "'non_existent_command' not found in '/path/to/bin_directory'"
