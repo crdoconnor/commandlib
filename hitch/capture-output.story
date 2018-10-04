@@ -1,4 +1,5 @@
 Capture output:
+  docs: capture-output
   based on: commandlib
   about: |
     You can run a command and capture the stdout and stderr to a string

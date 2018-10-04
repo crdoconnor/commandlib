@@ -1,4 +1,4 @@
-Run command:
+No arguments:
   based on: commandlib
   given:
     scripts:
@@ -14,7 +14,7 @@ Run command:
       contents: hello
 
 
-Arguments:
+One argument:
   based on: commandlib
   given:
     scripts:

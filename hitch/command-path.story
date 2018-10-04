@@ -1,4 +1,5 @@
-Command Path:
+Add directories to your command's PATH:
+  docs: command-path
   based on: commandlib
   about: |
     A CommandPath is an object that you can create to represent

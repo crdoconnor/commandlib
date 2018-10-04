@@ -1,0 +1,48 @@
+---
+title: {{ story.name }}
+type: using
+---
+{% if story.info['experimental'] %}{% raw %}
+{{< warning title="Experimental" >}}
+This feature is in alpha. The API may change on a minor version increment.
+{{< /warning >}}
+{% endraw %}{% endif %}
+
+{{ story.about }}
+
+{% for name, script in story.given.get('scripts', {}).items() %}
+{{ name }}:
+```bash
+{{ script }}
+```
+{%- endfor %}
+
+{% if story.given['setup'] != None %}
+```python
+{{ story.given['setup'] }}
+```
+{%- endif %}
+
+{% if story.variations %}
+
+{% for variation in story.variations %}
+{{ variation.child_name }}:
+
+{% for step in variation.steps %}
+{% with step = step %}{% include "step.jinja2" %}{% endwith %}
+{% endfor %}
+{% endfor %}
+
+{% else %}
+
+{% for step in story.steps %}
+{% with step = step %}{% include "step.jinja2" %}{% endwith %}
+{% endfor %}
+
+{% endif %}
+
+{% if include_title %}
+{% raw %}{{< note title="Executable specification" >}}{% endraw %}
+Page automatically generated from <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/{{ story.filename.basename() }}">{{ story.filename.basename() }}</a>.
+{% raw %}{{< /note >}}{% endraw %}
+{% endif %}

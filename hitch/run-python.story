@@ -1,4 +1,5 @@
-Use current python environment:
+Easily invoke commands from the current virtualenv:
+  docs: use-current-python-environment
   about: |
     You can run python code in the same environment
     by importing "python" command object or the

@@ -1,0 +1,11 @@
+base templates: template
+templated:
+- template/story.jinja2:
+    content: yes
+    filename: yes
+- using/alpha/index.md:
+    content: yes
+- using/index.md:
+    content: yes
+- index.md:
+    content: yes

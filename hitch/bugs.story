@@ -1,5 +1,5 @@
 Environment var bugs:
-  based on: Environment variables
+  based on: Run with extra environment variables
   variations:
     Setting PATH does not overwrite other environment variables:
       steps:

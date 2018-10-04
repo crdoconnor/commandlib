@@ -1,4 +1,5 @@
-Pipe in:
+Piping data in from string or file:
+  docs: pipe-data-in
   based on: commandlib
   given:
     scripts:
@@ -42,7 +43,8 @@ Pipe in:
           contents: hello harry
 
 
-Pipe out:
+Piping data out to string or file:
+  docs: pipe-data-out
   based on: commandlib
   given:
     scripts:

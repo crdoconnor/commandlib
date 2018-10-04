@@ -1,14 +1,7 @@
-Run interactively:
+Run commmands interactively using icommandlib or pexpect:
+  docs: run-interactively
   about: |
-    Commandlib is a small, self-contained library for running
-    commands in the current terminal.
-    
-    If you want to use it a manner similar to the UNIX command
-    line and pipe in to stdin via a string/file or pipe out
-    stdout/stderr to a file/string you can.
-    
-    However, if the command you want to run requires that you
-    run it in a more sophisticated way, for example:
+    However, if the command you want to run requires that:
     
     * It prompts the user for a response (yes or no / password / etc.)
     * It 'draws' on a terminal window - like 'top'.

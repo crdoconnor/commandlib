@@ -1,4 +1,5 @@
-Ignore non-zero exit codes:
+Run command and don't raise exception on nonzero exit code:
+  docs: ignore-nonzero-exit-codes
   based on: commandlib
   given:
     scripts:
