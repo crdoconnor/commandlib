@@ -1,4 +1,4 @@
-Add directories to your command's PATH:
+Easily invoke commands from one directory:
   docs: command-path
   based on: commandlib
   about: |
@@ -6,16 +6,17 @@ Add directories to your command's PATH:
     a directory with executables in it. You can then use that object
     to get command objects which you can then run.
 
+    This feature was created to be able to create a "postgres" or "node"
+    or "virtualenv" CommandPath object referencing their bin directory.
+    Commands in those bin directories (e.g. postgres / psql) could be run
+    and be able to directly call *other* commands in that directory without
+    referencing the absolute path.
+
     Command objects that are created from CommandPath objects 
     will automatically be run with that directory added to the beginning
     of their PATH. This means that they can run each other directly
     without specifying the directory.
 
-    This feature was created to be able to create a "postgres" or "node"
-    or "virtualenv" CommandPath object referencing their bin directory.
-    Commands in those bin directories (e.g. python) could be run and
-    be able to directly call other commands in that directory without
-    referencing the absolute path.
   given:
     scripts:
       bin_directory/ls: |
