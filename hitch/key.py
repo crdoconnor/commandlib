@@ -269,6 +269,14 @@ def docgen():
     hitchpylibrarytoolkit.docgen(_storybook(), DIR.project, DIR.key, DIR.gen)
 
 
+@expected(dirtemplate.exceptions.DirTemplateException)
+def readmegen():
+    """
+    Build documentation.
+    """
+    hitchpylibrarytoolkit.readmegen(_storybook(), DIR.project, DIR.key, DIR.gen, "commandlib")
+
+
 @ignore_ctrlc
 def ipy():
     """

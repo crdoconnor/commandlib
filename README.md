@@ -1,37 +1,57 @@
-{% if readme -%}
 # CommandLib
-{%- else -%}
----
-title: CommandLib
----
-{% endif %}
 
 Commandlib is a dependencyless library for calling external UNIX commands
 (e.g. in build scripts) in a clean, readable way.
 
 Using method chaining, you can build up Command objects that run in a specific
-directory, with specified [environment variables](using/alpha/environment-variables)
-and [PATHs](using/alpha/add-directory-to-path), etc.
+directory, with specified [environment variables](https://hitchdev.com/commandlib/using/alpha/environment-variables)
+and [PATHs](https://hitchdev.com/commandlib/using/alpha/add-directory-to-path), etc.
 
 For simplicity's sake, the library itself only runs commands in a blocking
 way (all commands run to completion before continuing), although it contains
 hooks to run non-blocking via either [icommandlib](https://github.com/crdoconnor/icommandlib)
 or [pexpect](https://pexpect.readthedocs.io/en/stable/).
 
-{% for story in quickstart %}
-{% for name, script in story.given.get('scripts', {}).items() %}
-Pretend '{{ name }}':
+
+
+Pretend 'django/manage.py':
 ```bash
-{{ script }}
+# Pretend django "manage.py" that just prints out arguments:
+import sys ; sys.stdout.write(' '.join(sys.argv[1:]))
+
 ```
-{%- endfor %}
 
 ```python
-{{ story.given['setup'] }}
+from commandlib import Command
+
+# Create base command
+python = Command("python")
+
+# Create command "python manage.py" that runs in the django directory
+manage = python("manage.py").in_dir("django")
+
+# Build even more specific command
+dev_manage = manage.with_trailing_args("--settings", "local_settings.py")
+
 ```
 
-{% with step = story.steps[0] %}{% include "step.jinja2" %}{% endwith %}
-{% endfor %}
+
+
+```python
+# Run combined command
+dev_manage("runserver", "8080").run()
+
+```
+
+Will output:
+```
+runserver 8080 --settings local_settings.py
+```
+
+
+
+
+
 
 ## Install
 
@@ -41,9 +61,7 @@ $ pip install commandlib
 
 ## Docs
 
-{% for dirfile in subdir("using/alpha/").is_not_dir() - subdir("using/alpha/").named("index.md") -%}
-- [{{ title(dirfile) }}](using/alpha/{{ dirfile.namebase }})
-{% endfor %}
+
 
 ## Why?
 
