@@ -8,8 +8,13 @@ title: CommandLib
 {% raw %}{{< github-stars user="crdoconnor" project="commandlib" >}}{% endraw %}
 {% endif %}
 
-Commandlib is an ergonomic library that lets you build pseudo-immutable UNIX command
-objects using method chaining:
+Commandlib is a dependencyless library for writing clean, readable code that runs a lot of
+UNIX commands (e.g. in build scripts). It avoids the tangle of messy code that you would
+get using the subprocess library directly (Popen, call, check_output(), .communicate(), etc.).
+
+Using method chaining, you can build up Command objects that run in a specific
+directory, with specified [environment variables](using/alpha/environment-variables)
+and [PATHs](using/alpha/add-directory-to-path), etc.
 
 {% for story in quickstart %}
 {% for name, script in story.given.get('scripts', {}).items() %}
@@ -26,15 +31,6 @@ Pretend '{{ name }}':
 {% with step = story.steps[0] %}{% include "step.jinja2" %}{% endwith %}
 {% endfor %}
 
-You can also:
-
-{% for dirfile in subdir("using/alpha/").is_not_dir() - subdir("using/alpha/").named("index.md") -%}
-- [{{ title(dirfile) }}](using/alpha/{{ dirfile.namebase }})
-{% endfor %}
-
-The tool was originally created to clean a lot of dirty build code that
-called subprocess. Like every other library in the world it was written for
-humans ;-)
 
 Install
 -------
@@ -42,3 +38,10 @@ Install
 ```sh
 $ pip install commandlib
 ```
+
+Docs
+----
+
+{% for dirfile in subdir("using/alpha/").is_not_dir() - subdir("using/alpha/").named("index.md") -%}
+- [{{ title(dirfile) }}](using/alpha/{{ dirfile.namebase }})
+{% endfor %}
