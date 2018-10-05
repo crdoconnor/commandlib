@@ -1,8 +1,8 @@
 from commandlib.exceptions import CommandError
 from commandlib.utils import _check_directory
 from commandlib.piped import PipedCommand
-from subprocess import PIPE, Popen
 from os import chdir, getcwd
+import subprocess
 import copy
 import sys
 import os
@@ -43,13 +43,7 @@ class Command(object):
         self._shell = None
         self._paths = []
         self._trailing_args = []
-        self._silent_stdout = False
-        self._silent_stderr = False
         self._ignore_errors = False
-        self._pipe_stdout_to_file = None
-        self._pipe_stderr_to_file = None
-        self._pipe_from_file = None
-        self._pipe_from_string = None
 
     @property
     def arguments(self):
@@ -166,70 +160,6 @@ class Command(object):
         new_command._paths.append(str(path))
         return new_command
 
-    def silently(self):
-        """
-        Return new Command object that will be run with stdout and
-        stderr suppressed.
-        """
-        new_command = copy.deepcopy(self)
-        new_command._silent_stdout = True
-        new_command._silent_stderr = True
-        return new_command
-
-    def only_errors(self):
-        """
-        Return new Command object that will be run with stdout but
-        not stderr suppressed.
-        """
-        new_command = copy.deepcopy(self)
-        new_command._silent_stdout = True
-        new_command._silent_stderr = False
-        return new_command
-
-    def pipe_stdout_to_file(self, handle):
-        """
-        Pipe the stdout output to file handle 'handle'.
-
-        Example usage::
-          command.pipe_stdout_to_file(open("/tmp/output", 'w'))
-        """
-        new_command = copy.deepcopy(self)
-        new_command._pipe_stdout_to_file = handle
-        return new_command
-
-    def pipe_stderr_to_file(self, handle):
-        """
-        Pipe the stderr output to file handle 'handle'.
-
-        Example usage::
-          command.pipe_stderr_to_file(open("/tmp/output", 'w'))
-        """
-        new_command = copy.deepcopy(self)
-        new_command._pipe_stderr_to_file = handle
-        return new_command
-
-    def pipe_from_file(self, handle):
-        """
-        Pipe the contents of the handle 'handle' to the command.
-
-        Example usage::
-          command.pipe_from_file(open("/tmp/output", 'w'))
-        """
-        new_command = copy.deepcopy(self)
-        new_command._pipe_from_file = handle
-        return new_command
-
-    def pipe_from_string(self, string):
-        """
-        Pipe the contents of the string to the command's stdin.
-
-        Example usage::
-          command.pipe_from_string("hello")
-        """
-        new_command = copy.deepcopy(self)
-        new_command._pipe_from_string = string
-        return new_command
-
     def interact(self):
         """
         Return icommand object which you can then run.
@@ -260,11 +190,6 @@ class Command(object):
         NOTE: Requires you to pip install 'pexpect' or will fail.
         """
         import pexpect
-        assert self._pipe_stderr_to_file is None
-        assert self._pipe_stdout_to_file is None
-        assert self._pipe_from_file is None
-        assert not self._silent_stdout
-        assert not self._silent_stderr
         assert not self._ignore_errors
 
         _check_directory(self.directory)
@@ -287,41 +212,11 @@ class Command(object):
         if self.directory is not None:
             chdir(self.directory)
 
-        stdout = None
-
-        if self._pipe_stdout_to_file is not None:
-            stdout = self._pipe_stdout_to_file
-
-        if self._silent_stdout:
-            stdout = PIPE
-
-        stderr = None
-
-        if self._pipe_stderr_to_file is not None:
-            stderr = self._pipe_stderr_to_file
-
-        if self._silent_stderr:
-            stderr = PIPE
-
-        if self._pipe_from_file is None and self._pipe_from_string is None:
-            stdin = None
-        else:
-            if self._pipe_from_string:
-                stdin = PIPE
-            if self._pipe_from_file:
-                stdin = self._pipe_from_file
-
-        process = Popen(
+        process = subprocess.Popen(
             self.arguments,
-            stdout=stdout,
-            stderr=stderr,
-            stdin=stdin,
             shell=self._shell,
             env=self.env,
         )
-
-        if self._pipe_from_string:
-            process.stdin.write(self._pipe_from_string.encode('utf8'))
 
         _, _ = process.communicate()
 
