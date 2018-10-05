@@ -20,6 +20,21 @@ def run(command):
     command.run()
 
 
+class DirectoryContextManager(object):
+    def __init__(self, directory):
+        self.directory = directory
+
+    def __enter__(self):
+        self._previous_directory = getcwd()
+
+        if self.directory is not None:
+            chdir(self.directory)
+
+    def __exit__(self, type, value, traceback):
+        if self.directory is not None:
+            chdir(self._previous_directory)
+
+
 class Command(object):
     """
     Command object containing details of a command and how it should be run.
@@ -207,22 +222,16 @@ class Command(object):
         """Run command and wait until it finishes."""
         _check_directory(self.directory)
 
-        previous_directory = getcwd()
+        with DirectoryContextManager(self.directory):
+            process = subprocess.Popen(
+                self.arguments,
+                shell=self._shell,
+                env=self.env,
+            )
 
-        if self.directory is not None:
-            chdir(self.directory)
-
-        process = subprocess.Popen(
-            self.arguments,
-            shell=self._shell,
-            env=self.env,
-        )
-
-        _, _ = process.communicate()
+            _, _ = process.communicate()
 
         returncode = process.returncode
-
-        chdir(previous_directory)
 
         if returncode != 0 and not self._ignore_errors:
             raise CommandError('"{0}" failed (err code {1})'.format(
