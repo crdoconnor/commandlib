@@ -16,7 +16,6 @@ Easily invoke commands from one directory:
     will automatically be run with that directory added to the beginning
     of their PATH. This means that they can run each other directly
     without specifying the directory.
-
   given:
     scripts:
       bin_directory/ls: |
