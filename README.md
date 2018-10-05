@@ -61,6 +61,15 @@ $ pip install commandlib
 
 ## Docs
 
+- [Run commmands interactively using icommandlib or pexpect](https://hitchdev.com/commandlib/using/alpha/run-interactively)
+- [Easily invoke commands from one directory (CommandPath)](https://hitchdev.com/commandlib/using/alpha/command-path)
+- [Easily invoke commands from the current virtualenv (python_bin)](https://hitchdev.com/commandlib/using/alpha/use-current-python-environment)
+- [Add directory to PATH (with_path)](https://hitchdev.com/commandlib/using/alpha/add-directory-to-path)
+- [Piping data in from string or file (.piped)](https://hitchdev.com/commandlib/using/alpha/pipe-data-in)
+- [Capture output (.output())](https://hitchdev.com/commandlib/using/alpha/capture-output)
+- [Piping data out to string or file (.piped)](https://hitchdev.com/commandlib/using/alpha/pipe-data-out)
+- [Run command and don't raise exception on nonzero exit code (ignore_errors())](https://hitchdev.com/commandlib/using/alpha/ignore-nonzero-exit-codes)
+- [Change your command's environment variables (with_env)](https://hitchdev.com/commandlib/using/alpha/environment-variables)
 
 
 ## Why?
