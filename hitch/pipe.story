@@ -1,4 +1,4 @@
-Piping data in from string or file:
+Piping data in from string or file (.piped):
   docs: pipe-data-in
   based on: commandlib
   given:
@@ -43,7 +43,7 @@ Piping data in from string or file:
           contents: hello harry
 
 
-Piping data out to string or file:
+Piping data out to string or file (.piped):
   docs: pipe-data-out
   based on: commandlib
   given:

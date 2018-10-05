@@ -5,20 +5,17 @@ Run commmands interactively using icommandlib or pexpect:
     
     * It prompts the user for a response (yes or no / password / etc.)
     * It 'draws' on a terminal window - like 'top'.
-    * You want to interact with the process and do other stuff while it runs (e.g. a database service)
+    * You want to interact with the process and do other stuff while it runs
+    (e.g. wait for a database service to warm up and then continue).
     
-    Then you need a more sophisticated library that can handle
-    these kinds of interactions.
+    Then you need an interactive library.
     
-    Commandlib can call and create a process object for two
-    other libraries this way - ICommandLib and pexpect.
+    Commandlib can call and create an interactive process object for two
+    other libraries this way - [ICommandLib](https://github.com/crdoconnor/icommandlib)
+    and [pexpect](https://pexpect.readthedocs.io/en/stable/).
     
-    ICommandLib is currently in alpha and has some kinks,
-    but should be a better replacement for pexpect soon.
-    It only runs in python 3.
-    
-    Pexpect is very mature and runs in python 2 but is a bit
-    long in the tooth.
+    The two examples below are not actually interactive but they demonstrate
+    how pexpect and icommandlib can be used.
   based on: commandlib
   given:
     scripts:

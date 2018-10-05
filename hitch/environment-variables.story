@@ -1,4 +1,4 @@
-Run with extra environment variables:
+Change your command's environment variables (with_env):
   docs: environment-variables
   based on: commandlib
   about: |
@@ -9,27 +9,38 @@ Run with extra environment variables:
     All parent environment variables will be passed on by
     default.
   given:
-    scripts:
-      outputtext: |
-        #!/bin/bash
-        echo hello $ENVVAR > output
-      outputpath: |
-        #!/bin/bash
-        echo hello $HOME > output
     setup: |
       from commandlib import Command
   variations:
     With extra environment variable:
+      given:
+        scripts:
+          outputtext: |
+            #!/bin/bash
+            echo hello $ENVVAR
       steps:
-      - Run: Command("./outputtext").with_env(ENVVAR="tom").run()
-      - File contents will be:
-          filename: output
-          contents: hello tom
-    
-    Dropping an environment variable:
-      steps:
-      - Run: Command("./outputpath").without_env("HOME").run()
-      - File contents will be:
-          filename: output
-          contents: hello
+      - Run:
+         code: Command("./outputtext").with_env(ENVVAR="tom").run()
+         will output: hello tom
 
+    Dropping an environment variable:
+      given:
+        scripts:
+          outputpath: |
+            #!/bin/bash
+            echo hello $HOME
+      steps:
+      - Run:
+          code: Command("./outputpath").without_env("HOME").run()
+          will output: hello
+
+    Dropping nonexistent variable does nothing:
+      given:
+        scripts:
+          outputtext: |
+            #!/bin/bash
+            echo hello $SOMEOTHERVAR
+      steps:
+      - Run:
+          code: Command("outputtext").without_env("NONEXISTENTVAR").with_path(".").run()
+          will output: hello

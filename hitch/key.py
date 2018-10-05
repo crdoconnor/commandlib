@@ -269,7 +269,6 @@ def docgen():
     hitchpylibrarytoolkit.docgen(_storybook(), DIR.project, DIR.key, DIR.gen)
 
 
-
 @ignore_ctrlc
 def ipy():
     """

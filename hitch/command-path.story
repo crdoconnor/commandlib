@@ -1,4 +1,4 @@
-Easily invoke commands from one directory:
+Easily invoke commands from one directory (CommandPath):
   docs: command-path
   based on: commandlib
   about: |

@@ -1,4 +1,4 @@
-Run command and don't raise exception on nonzero exit code:
+Run command and don't raise exception on nonzero exit code (ignore_errors()):
   docs: ignore-nonzero-exit-codes
   based on: commandlib
   given:

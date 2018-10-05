@@ -1,4 +1,4 @@
-Capture output:
+Capture output (.output()):
   docs: capture-output
   based on: commandlib
   about: |

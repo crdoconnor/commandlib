@@ -1,4 +1,4 @@
-Easily invoke commands from the current virtualenv:
+Easily invoke commands from the current virtualenv (python_bin):
   docs: use-current-python-environment
   about: |
     You can run python code in the same environment
