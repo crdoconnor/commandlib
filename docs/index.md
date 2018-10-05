@@ -17,7 +17,7 @@ and [PATHs](using/alpha/add-directory-to-path), etc.
 
 For simplicity's sake, the library itself only runs commands in a blocking
 way (all commands run to completion before continuing), although it contains
-hooks to run non-blocking commands by either [icommandlib](https://github.com/crdoconnor/icommandlib)
+hooks to run non-blocking via either [icommandlib](https://github.com/crdoconnor/icommandlib)
 or [pexpect](https://pexpect.readthedocs.io/en/stable/).
 
 {% for story in quickstart %}
@@ -58,13 +58,14 @@ It's a [heavily dogfooded](/principles/extreme-dogfooding) library.
 ## Why not use [Delegator](https://github.com/kennethreitz/delegator.py) instead (Kenneth Reitz's 'subprocesses for humans')?
 
 Kenneth Reitz (author of requests "urllib2/3 for humans"), wrote a similarly inspired "subprocess for humans"
-called envoy. That is now deprecated and there is now a replacement called delegator, which r
+called envoy. That is now deprecated and there is now a replacement called delegator, which is a very thin
+wrapper around subprocess.
 
 Features delegator has which commandlib does not:
 
-* Delegator runs subprocesses in both a blocking and nonblocking way (using pexpect). commandlib only does blocking, since running processes in a nonblocking way opens up a massive can of worms, but it does 
-
 * Delegator can chain commands, much like bash does (delegator.chain('fortune | cowsay')). Commandlib doesn't do that because while dogfooding the library I never encountered a use case where I found this to be necessary. You can, however, easily get the output of one command using .output() as a string and feed it into another using piped.from_string(string).
+
+* Delegator runs subprocesses in both a blocking and nonblocking way (using pexpect). commandlib only does blocking by itself but if you pip install pexpect or icommandlib it can run via either one of them.
 
 Features which both have:
 
