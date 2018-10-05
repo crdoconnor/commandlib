@@ -8,13 +8,17 @@ title: CommandLib
 {% raw %}{{< github-stars user="crdoconnor" project="commandlib" >}}{% endraw %}
 {% endif %}
 
-Commandlib is a dependencyless library for writing clean, readable code that runs a lot of
-UNIX commands (e.g. in build scripts). It avoids the tangle of messy code that you would
-get using the subprocess library directly (Popen, call, check_output(), .communicate(), etc.).
+Commandlib is a dependencyless library for calling external UNIX commands
+(e.g. in build scripts) in a clean, readable way.
 
 Using method chaining, you can build up Command objects that run in a specific
 directory, with specified [environment variables](using/alpha/environment-variables)
 and [PATHs](using/alpha/add-directory-to-path), etc.
+
+For simplicity's sake, the library itself only runs commands in a blocking
+way (all commands run to completion before continuing), although it contains
+hooks to run non-blocking commands by either [icommandlib](https://github.com/crdoconnor/icommandlib)
+or [pexpect](https://pexpect.readthedocs.io/en/stable/).
 
 {% for story in quickstart %}
 {% for name, script in story.given.get('scripts', {}).items() %}
@@ -31,17 +35,54 @@ Pretend '{{ name }}':
 {% with step = story.steps[0] %}{% include "step.jinja2" %}{% endwith %}
 {% endfor %}
 
-
-Install
--------
+## Install
 
 ```sh
 $ pip install commandlib
 ```
 
-Docs
-----
+## Docs
 
 {% for dirfile in subdir("using/alpha/").is_not_dir() - subdir("using/alpha/").named("index.md") -%}
 - [{{ title(dirfile) }}](using/alpha/{{ dirfile.namebase }})
 {% endfor %}
+
+## Why?
+
+Commandlib avoids the tangle of messy code that you would
+get using the subprocess library directly (Popen, call, check_output(), .communicate(), etc.)
+and the [confusion that results](https://stackoverflow.com/questions/89228/calling-an-external-command-in-python).
+
+It's a [heavily dogfooded](/principles/extreme-dogfooding) library.
+
+## Why not use [Delegator](https://github.com/kennethreitz/delegator.py) instead (Kenneth Reitz's 'subprocesses for humans')?
+
+Kenneth Reitz (author of requests "urllib2/3 for humans"), wrote a similarly inspired "subprocess for humans"
+called envoy. That is now deprecated and there is now a replacement called delegator, which r
+
+Features delegator has which commandlib does not:
+
+* Delegator runs subprocesses in both a blocking and nonblocking way (using pexpect). commandlib only does blocking, since running processes in a nonblocking way opens up a massive can of worms, but it does 
+
+* Delegator can chain commands, much like bash does (delegator.chain('fortune | cowsay')). Commandlib doesn't do that because while dogfooding the library I never encountered a use case where I found this to be necessary. You can, however, easily get the output of one command using .output() as a string and feed it into another using piped.from_string(string).
+
+Features which both have:
+
+* Ability to set environment variables.
+* Ability to run pexpect process from command object.
+
+Features which only commandlib has:
+
+* Ability to set PATH easily.
+* Ability call code from within the current virtualenv easily.
+* Ability to pipe in strings or files and easily pipe out to strings or file (or file handles).
+
+## Why not use other tools?
+
+* subprocess - if you just call one or two external commands, it's probably fine, but beyond that it will become a mess.
+
+* os.system(*) - only capable of running simple bash commands.
+
+* [sh](https://amoffat.github.io/sh/) - uses a lot of magic. Attempts to make python more like shell rather than making running commands more pythonic.
+
+* [plumbum](https://plumbum.readthedocs.io/en/latest/]) - similar to amoffat's sh, tries to make a sort of "bash inside python". Also has a weird way of building commands from dict syntax (grep["-v", "\\.py"]).
