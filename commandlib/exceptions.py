@@ -1,5 +1,6 @@
 class CommandError(Exception):
     """commandlib exception."""
+
     pass
 
 
@@ -11,9 +12,7 @@ class CommandExitError(CommandError):
 
     def __unicode__(self):
         return '"{0}" failed (err code {1}), output:\n\n{2}'.format(
-            self.command_repr,
-            self.return_code,
-            self.output,
+            self.command_repr, self.return_code, self.output
         )
 
     def __str__(self):

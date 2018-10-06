@@ -45,6 +45,7 @@ class Command(object):
       * PATH to run the command with (on top of system paths).
       * Environment variables to run with the command.
     """
+
     def __init__(self, *args):
         """
         Create new command object::
@@ -75,7 +76,7 @@ class Command(object):
         env_vars = os.environ.copy()
         env_vars.update(self._env)
         new_path = ":".join(
-            self._paths + [env_vars["PATH"], ] if "PATH" in env_vars else [] + self._paths
+            self._paths + [env_vars["PATH"]] if "PATH" in env_vars else [] + self._paths
         )
         env_vars["PATH"] = new_path
         for env_var in self._env_drop:
@@ -106,7 +107,7 @@ class Command(object):
         When the Command object is called, it returns a new Command
         object with additional arguments.
         """
-        arguments = [str(arg) for arg in arguments]     # Force list to string
+        arguments = [str(arg) for arg in arguments]  # Force list to string
         new_command = copy.deepcopy(self)
         new_command._arguments.extend(arguments)
         return new_command
@@ -182,6 +183,7 @@ class Command(object):
         NOTE: Requires you to pip install 'icommandlib' or will fail.
         """
         import icommandlib
+
         return icommandlib.ICommand(self)
 
     @property
@@ -205,6 +207,7 @@ class Command(object):
         NOTE: Requires you to pip install 'pexpect' or will fail.
         """
         import pexpect
+
         assert not self._ignore_errors
 
         _check_directory(self.directory)
@@ -212,10 +215,7 @@ class Command(object):
         arguments = self.arguments
 
         return pexpect.spawn(
-            arguments[0],
-            args=arguments[1:],
-            env=self.env,
-            cwd=self.directory,
+            arguments[0], args=arguments[1:], env=self.env, cwd=self.directory
         )
 
     def run(self):
@@ -223,21 +223,16 @@ class Command(object):
         _check_directory(self.directory)
 
         with DirectoryContextManager(self.directory):
-            process = subprocess.Popen(
-                self.arguments,
-                shell=self._shell,
-                env=self.env,
-            )
+            process = subprocess.Popen(self.arguments, shell=self._shell, env=self.env)
 
             _, _ = process.communicate()
 
         returncode = process.returncode
 
         if returncode != 0 and not self._ignore_errors:
-            raise CommandError('"{0}" failed (err code {1})'.format(
-                self.__repr__(),
-                returncode
-            ))
+            raise CommandError(
+                '"{0}" failed (err code {1})'.format(self.__repr__(), returncode)
+            )
 
     def output(self):
         """Run command until it finishes and return output as string."""

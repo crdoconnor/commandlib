@@ -24,9 +24,7 @@ class CommandPath(object):
 
         if not exists(directory):
             raise CommandError(
-                "Can't create CommandPath object: {0} does not exist.".format(
-                    directory
-                )
+                "Can't create CommandPath object: {0} does not exist.".format(directory)
             )
 
         self._directory = directory

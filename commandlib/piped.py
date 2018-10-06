@@ -57,7 +57,11 @@ class PipedCommand(object):
 
         previous_directory = getcwd()
 
-        if self._from_handle is None and self._from_string is None and self._from_filename is None:
+        if (
+            self._from_handle is None
+            and self._from_string is None
+            and self._from_filename is None
+        ):
             stdin = None
         else:
             if self._from_string:
@@ -65,7 +69,7 @@ class PipedCommand(object):
             if self._from_handle:
                 stdin = self._from_handle
             if self._from_filename:
-                stdin = open(self._from_filename, 'r')
+                stdin = open(self._from_filename, "r")
 
         if self._stdout_to_handle is None and self._stdout_to_filename is None:
             stdout = None
@@ -73,7 +77,7 @@ class PipedCommand(object):
             if self._stdout_to_handle:
                 stdout = self._stdout_to_handle
             if self._stdout_to_filename:
-                stdout = open(self._stdout_to_filename, 'w')
+                stdout = open(self._stdout_to_filename, "w")
 
         if self._stderr_to_handle is None:
             stderr = PIPE
@@ -95,7 +99,7 @@ class PipedCommand(object):
             )
 
             if self._from_string:
-                process.stdin.write(self._from_string.encode('utf8'))
+                process.stdin.write(self._from_string.encode("utf8"))
 
             _, _ = process.communicate()
 
@@ -111,10 +115,9 @@ class PipedCommand(object):
             chdir(previous_directory)
 
         if returncode != 0 and not self._command._ignore_errors:
-            raise CommandError('"{0}" failed (err code {1})'.format(
-                self.__repr__(),
-                returncode
-            ))
+            raise CommandError(
+                '"{0}" failed (err code {1})'.format(self.__repr__(), returncode)
+            )
 
     def output(self):
         _check_directory(self._command.directory)
@@ -142,7 +145,7 @@ class PipedCommand(object):
         )
 
         if self._from_string:
-            process.stdin.write(self._from_string.encode('utf8'))
+            process.stdin.write(self._from_string.encode("utf8"))
 
         stdoutput, _ = process.communicate()
 
@@ -152,12 +155,10 @@ class PipedCommand(object):
 
         if returncode != 0 and not self._command._ignore_errors:
             raise CommandExitError(
-                self.__repr__(),
-                returncode,
-                stdoutput.decode('utf8').strip(),
+                self.__repr__(), returncode, stdoutput.decode("utf8").strip()
             )
 
-        return stdoutput.decode('utf8')
+        return stdoutput.decode("utf8")
 
     def __str__(self):
         return " ".join(self._command.arguments)

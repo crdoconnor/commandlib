@@ -9,6 +9,7 @@ class Commands(object):
     """
     Command group object representing a group of executable commands (DEPRECATED).
     """
+
     def _directory_commands(self):
         commands = {}
 
@@ -18,7 +19,9 @@ class Commands(object):
 
                 if isfile(absfilename) and access(absfilename, os.X_OK):
                     object_name = filename.replace(".", "_").replace("-", "_")
-                    commands[object_name] = Command(absfilename).with_path(self.bin_directory)
+                    commands[object_name] = Command(absfilename).with_path(
+                        self.bin_directory
+                    )
         return commands
 
     def __init__(self, bin_directory=None):
@@ -47,19 +50,21 @@ class Commands(object):
         self._added_commands = {}
 
     def __setattr__(self, name, value):
-        if name in ["bin_directory", "_added_commands", ]:
+        if name in ["bin_directory", "_added_commands"]:
             self.__dict__[name] = value
             return
 
         if type(value) != Command:
             raise CommandError(
-                "Command {0} must be of type commandlib.Command".format(value.__repr__())
+                "Command {0} must be of type commandlib.Command".format(
+                    value.__repr__()
+                )
             )
         self._added_commands[name] = value
 
     def __getattr__(self, name):
         # Make tab autocompletion work in IPython
-        if name in ["bin_directory", "_added_commands", ]:
+        if name in ["bin_directory", "_added_commands"]:
             return self.__dict__[name]
 
         if name == "__methods__":
@@ -67,8 +72,8 @@ class Commands(object):
 
         if name == "trait_names" or name == "_getAttributeNames":
             return list(
-                set(self._added_commands.keys()) |
-                set(self._directory_commands().keys())
+                set(self._added_commands.keys())
+                | set(self._directory_commands().keys())
             )
 
         # If command is in _added_commands use that first
@@ -79,8 +84,8 @@ class Commands(object):
         if name in dir_cmds.keys():
             return dir_cmds[name]
 
-        raise CommandError("Command {0} not found in {1} or added commands: {2}".format(
-            name,
-            abspath(self.bin_directory),
-            str(self._added_commands)
-        ))
+        raise CommandError(
+            "Command {0} not found in {1} or added commands: {2}".format(
+                name, abspath(self.bin_directory), str(self._added_commands)
+            )
+        )

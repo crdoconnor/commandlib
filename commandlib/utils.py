@@ -7,9 +7,7 @@ def _check_directory(directory):
     if directory is not None:
         if not exists(directory):
             raise CommandError(
-                "Cannot run command - directory {0} does not exist".format(
-                    directory
-                )
+                "Cannot run command - directory {0} does not exist".format(directory)
             )
 
         if not isdir(directory):
