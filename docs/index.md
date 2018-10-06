@@ -53,6 +53,29 @@ and the [confusion that results](https://stackoverflow.com/questions/89228/calli
 
 It's a [heavily dogfooded](https://hitchdev.com/principles/extreme-dogfooding) library. For humans. Because who else?
 
+## Is subprocess really that bad?
+
+The code will likely be longer and messier. For example, from [stack overflow](https://stackoverflow.com/questions/2231227/python-subprocess-popen-with-a-modified-environment):
+
+```python
+import subprocess, os
+previous_directory = os.getcwd()
+
+os.chdir("command_directory")
+my_env = os.environ.copy()
+my_env["PATH"] = "/usr/sbin:/sbin:" + my_env["PATH"]
+subprocess.Popen(my_command, env=my_env)
+os.chdir(previous_directory)
+```
+
+Equivalent:
+
+```python
+from commandlib import Command
+
+Command(my_command).with_path("/usr/sbin:/sbin:").in_dir("command_directory").run()
+```
+
 ## Why not use Delegator instead (Kenneth Reitz's 'subprocesses for humans')?
 
 Kenneth Reitz (author of requests "urllib2/3 for humans"), wrote a similarly inspired "subprocess for humans"
@@ -65,6 +88,8 @@ Features delegator has which commandlib does not:
 
 * Delegator runs subprocesses in both a blocking and nonblocking way (using pexpect). commandlib only does blocking by itself but if you pip install pexpect or icommandlib it can run via either one of them.
 
+* Runs on windows
+
 Features which both have:
 
 * Ability to set environment variables.
@@ -75,12 +100,11 @@ Features which only commandlib has:
 * Ability to set PATH easily.
 * Ability call code from within the current virtualenv easily.
 * Ability to pipe in strings or files and easily pipe out to strings or file (or file handles).
+* Hook to easily run commands in from the current virtualenv.
 
 ## Why not use other tools?
 
-* subprocess - if you just call one or two external commands, it's probably fine, but beyond that it will become a mess.
-
-* os.system(*) - only capable of running simple bash commands.
+* os.system(*) - only capable of running very simple bash commands.
 
 * [sh](https://amoffat.github.io/sh/) - uses a lot of magic. Attempts to make python more like shell rather than making running commands more pythonic.
 
