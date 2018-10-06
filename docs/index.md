@@ -51,7 +51,7 @@ Commandlib avoids the tangle of messy code that you would
 get using the subprocess library directly (Popen, call, check_output(), .communicate(), etc.)
 and the [confusion that results](https://stackoverflow.com/questions/89228/calling-an-external-command-in-python).
 
-It's a [heavily dogfooded](https://hitchdev.com/principles/extreme-dogfooding) library.
+It's a [heavily dogfooded](https://hitchdev.com/principles/extreme-dogfooding) library. For humans. Because who else?
 
 ## Why not use Delegator instead (Kenneth Reitz's 'subprocesses for humans')?
 
