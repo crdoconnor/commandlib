@@ -5,5 +5,5 @@ title: Using Commandlib
 How to:
 
 {% for dirfile in subdir("using/alpha/").is_not_dir() - subdir("using/alpha/").named("index.md") -%}
-- [{{ title(dirfile) }}](alpha/{{ dirfile.namebase }})
+- [{{ title(dirfile) }}]({{ dirfile.namebase }})
 {% endfor %}
