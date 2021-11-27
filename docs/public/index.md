@@ -1,11 +1,14 @@
-# CommandLib
+---
+title: CommandLib
+---
+
 
 Commandlib is a dependencyless library for calling external UNIX commands
 (e.g. in build scripts) in a clean, readable way.
 
 Using method chaining, you can build up Command objects that run in a specific
-directory, with specified [environment variables](https://hitchdev.com/commandlib/using/alpha/environment-variables)
-and [PATHs](https://hitchdev.com/commandlib/using/alpha/add-directory-to-path), etc.
+directory, with specified [environment variables](using/alpha/environment-variables)
+and [PATHs](using/alpha/add-directory-to-path), etc.
 
 For simplicity's sake, the library itself only runs commands in a blocking
 way (all commands run to completion before continuing), although it contains
@@ -61,15 +64,15 @@ $ pip install commandlib
 
 ## Docs
 
-- [Easily invoke commands from the current virtualenv (python_bin)](https://hitchdev.com/commandlib/using/alpha/)
-- [Run commmands interactively using icommandlib or pexpect](https://hitchdev.com/commandlib/using/alpha/)
-- [Piping data out to string or file (.piped)](https://hitchdev.com/commandlib/using/alpha/)
-- [Easily invoke commands from one directory (CommandPath)](https://hitchdev.com/commandlib/using/alpha/)
-- [Add directory to PATH (with_path)](https://hitchdev.com/commandlib/using/alpha/)
-- [Piping data in from string or file (.piped)](https://hitchdev.com/commandlib/using/alpha/)
-- [Run command and don't raise exception on nonzero exit code (ignore_errors())](https://hitchdev.com/commandlib/using/alpha/)
-- [Change your command's environment variables (with_env)](https://hitchdev.com/commandlib/using/alpha/)
-- [Capture output (.output())](https://hitchdev.com/commandlib/using/alpha/)
+- [Easily invoke commands from the current virtualenv (python_bin)](using/alpha/)
+- [Run commmands interactively using icommandlib or pexpect](using/alpha/)
+- [Piping data out to string or file (.piped)](using/alpha/)
+- [Easily invoke commands from one directory (CommandPath)](using/alpha/)
+- [Add directory to PATH (with_path)](using/alpha/)
+- [Piping data in from string or file (.piped)](using/alpha/)
+- [Run command and don't raise exception on nonzero exit code (ignore_errors())](using/alpha/)
+- [Change your command's environment variables (with_env)](using/alpha/)
+- [Capture output (.output())](using/alpha/)
 
 
 ## Why?

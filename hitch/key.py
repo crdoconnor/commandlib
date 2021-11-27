@@ -11,6 +11,12 @@ import hitchpylibrarytoolkit
 import dirtemplate
 
 
+toolkit = hitchpylibrarytoolkit.ProjectToolkit(
+    "commandlib",
+    DIR,
+)
+
+
 class Engine(BaseEngine):
     """Python engine for running tests."""
 
@@ -264,21 +270,21 @@ def reformat():
     """
     Reformat using black and then relint.
     """
-    hitchpylibrarytoolkit.reformat(DIR.project, "commandlib")
+    toolkit.reformat()
 
 
 def lint():
     """
     Lint project code and hitch code.
     """
-    hitchpylibrarytoolkit.lint(DIR.project, "commandlib")
+    toolkit.lint(exclude=["__init__.py"])
 
 
 def deploy(version):
     """
     Deploy to pypi as specified version.
     """
-    hitchpylibrarytoolkit.deploy(DIR.project, "commandlib", version)
+    toolkit.readmegen(version)
 
 
 @expected(dirtemplate.exceptions.DirTemplateException)
@@ -286,7 +292,7 @@ def docgen():
     """
     Build documentation.
     """
-    hitchpylibrarytoolkit.docgen(_storybook(), DIR.project, DIR.key, DIR.gen)
+    toolkit.docgen(Engine(DIR))
 
 
 @expected(dirtemplate.exceptions.DirTemplateException)
@@ -294,6 +300,4 @@ def readmegen():
     """
     Build documentation.
     """
-    hitchpylibrarytoolkit.readmegen(
-        _storybook(), DIR.project, DIR.key, DIR.gen, "commandlib"
-    )
+    toolkit.readmegen(Engine(DIR))
