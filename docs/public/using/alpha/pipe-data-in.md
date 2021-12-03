@@ -1,6 +1,5 @@
 ---
 title: Piping data in from string or file (.piped)
-type: using
 ---
 
 
@@ -97,6 +96,8 @@ hello harry
 
 
 
-{{< note title="Executable specification" >}}
-Page automatically generated from <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/pipe.story">pipe.story</a>.
-{{< /note >}}
+!!! note "Executable specification"
+
+    Documentation automatically generated from 
+    <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/story/pipe.story">pipe.story
+    storytests.

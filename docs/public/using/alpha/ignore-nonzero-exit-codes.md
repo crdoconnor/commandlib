@@ -1,6 +1,5 @@
 ---
 title: Run command and don't raise exception on nonzero exit code (ignore_errors())
-type: using
 ---
 
 
@@ -44,6 +43,8 @@ hello
 
 
 
-{{< note title="Executable specification" >}}
-Page automatically generated from <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/ignore-errors.story">ignore-errors.story</a>.
-{{< /note >}}
+!!! note "Executable specification"
+
+    Documentation automatically generated from 
+    <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/story/ignore-errors.story">ignore-errors.story
+    storytests.

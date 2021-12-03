@@ -1,6 +1,5 @@
 ---
 title: Run commmands interactively using icommandlib or pexpect
-type: using
 ---
 
 
@@ -78,6 +77,8 @@ process.close()
 
 
 
-{{< note title="Executable specification" >}}
-Page automatically generated from <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/icommand-or-pexpect.story">icommand-or-pexpect.story</a>.
-{{< /note >}}
+!!! note "Executable specification"
+
+    Documentation automatically generated from 
+    <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/story/icommand-or-pexpect.story">icommand-or-pexpect.story
+    storytests.

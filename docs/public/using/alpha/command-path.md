@@ -1,6 +1,5 @@
 ---
 title: Easily invoke commands from one directory (CommandPath)
-type: using
 ---
 
 
@@ -150,6 +149,8 @@ commandlib.exceptions.CommandError:
 
 
 
-{{< note title="Executable specification" >}}
-Page automatically generated from <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/command-path.story">command-path.story</a>.
-{{< /note >}}
+!!! note "Executable specification"
+
+    Documentation automatically generated from 
+    <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/story/command-path.story">command-path.story
+    storytests.

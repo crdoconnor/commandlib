@@ -1,6 +1,5 @@
 ---
 title: Easily invoke commands from the current virtualenv (python_bin)
-type: using
 ---
 
 
@@ -76,6 +75,8 @@ hello
 
 
 
-{{< note title="Executable specification" >}}
-Page automatically generated from <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/run-python.story">run-python.story</a>.
-{{< /note >}}
+!!! note "Executable specification"
+
+    Documentation automatically generated from 
+    <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/story/run-python.story">run-python.story
+    storytests.

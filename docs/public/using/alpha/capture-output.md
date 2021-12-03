@@ -1,6 +1,5 @@
 ---
 title: Capture output (.output())
-type: using
 ---
 
 
@@ -84,6 +83,8 @@ bad output from stderr
 
 
 
-{{< note title="Executable specification" >}}
-Page automatically generated from <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/capture-output.story">capture-output.story</a>.
-{{< /note >}}
+!!! note "Executable specification"
+
+    Documentation automatically generated from 
+    <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/story/capture-output.story">capture-output.story
+    storytests.

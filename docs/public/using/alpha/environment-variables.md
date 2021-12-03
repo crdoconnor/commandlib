@@ -1,6 +1,5 @@
 ---
 title: Change your command's environment variables (with_env)
-type: using
 ---
 
 
@@ -84,6 +83,8 @@ hello
 
 
 
-{{< note title="Executable specification" >}}
-Page automatically generated from <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/environment-variables.story">environment-variables.story</a>.
-{{< /note >}}
+!!! note "Executable specification"
+
+    Documentation automatically generated from 
+    <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/story/environment-variables.story">environment-variables.story
+    storytests.

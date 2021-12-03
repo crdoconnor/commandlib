@@ -1,6 +1,5 @@
 ---
 title: Add directory to PATH (with_path)
-type: using
 ---
 
 
@@ -61,6 +60,8 @@ hello harry
 
 
 
-{{< note title="Executable specification" >}}
-Page automatically generated from <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/with-path.story">with-path.story</a>.
-{{< /note >}}
+!!! note "Executable specification"
+
+    Documentation automatically generated from 
+    <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/story/with-path.story">with-path.story
+    storytests.

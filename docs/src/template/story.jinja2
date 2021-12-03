@@ -1,12 +1,11 @@
 ---
 title: {{ story.name }}
-type: using
 ---
-{% if story.info['experimental'] %}{% raw %}
-{{< warning title="Experimental" >}}
-This feature is in alpha. The API may change on a minor version increment.
-{{< /warning >}}
-{% endraw %}{% endif %}
+{% if story.info['experimental'] %}
+!!! warning "Experimental"
+
+    This feature is in alpha. The API may change on a minor version increment.
+{% endif %}
 
 {{ story.about }}
 
@@ -42,7 +41,9 @@ This feature is in alpha. The API may change on a minor version increment.
 {% endif %}
 
 {% if include_title %}
-{% raw %}{{< note title="Executable specification" >}}{% endraw %}
-Page automatically generated from <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/{{ story.filename.basename() }}">{{ story.filename.basename() }}</a>.
-{% raw %}{{< /note >}}{% endraw %}
+!!! note "Executable specification"
+
+    Documentation automatically generated from 
+    <a href="https://github.com/crdoconnor/commandlib/blob/master/hitch/story/{{ story.filename.basename() }}">{{ story.filename.basename() }}
+    storytests.
 {% endif %}
