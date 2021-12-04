@@ -82,7 +82,7 @@ Commandlib avoids the tangle of messy code that you would
 get using the subprocess library directly (Popen, call, check_output(), .communicate(), etc.)
 and the [confusion that results](https://stackoverflow.com/questions/89228/calling-an-external-command-in-python).
 
-It's a [heavily dogfooded](https://hitchdev.com/principles/extreme-dogfooding) library. For humans. Because who else?
+It's a [heavily dogfooded](https://hitchdev.com/approach/contributing/extreme-dogfooding) library.
 
 ## Is subprocess really that bad?
 
@@ -139,4 +139,4 @@ Features which only commandlib has:
 
 * [sh](https://amoffat.github.io/sh/) - uses a lot of magic. Attempts to make python more like shell rather than making running commands more pythonic.
 
-* [plumbum](https://plumbum.readthedocs.io/en/latest/]) - similar to amoffat's sh, tries to make a sort of "bash inside python". Also has a weird way of building commands from dict syntax (grep["-v", "\\.py"]).
+* [plumbum](https://plumbum.readthedocs.io/en/latest/) - similar to amoffat's sh, tries to make a sort of "bash inside python". Also has a weird way of building commands from dict syntax (grep["-v", "\\.py"]).
