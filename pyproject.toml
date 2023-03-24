@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["commandlib"]
+
+[project]
+name = "commandlib"
+authors = [
+    {name = "Colm O'Connor", email = "colm.oconnor.github@gmail.com"},
+]
+description = "Pythonic command runner."
+license = {text = "MIT"}
+requires-python = ">=3.7.0"
+keywords = ["subprocess", "commands"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Libraries",
+    "Natural Language :: English",
+    "Environment :: Console",
+]
+dependencies = []
+dynamic = ["version", "readme"]
+
+[project.urls]
+homepage = "https://hitchdev.com/commandlib"
+documentation = "https://hitchdev.com/commandlib/using"
+repository = "https://github.com/commandlib/hitchstory"
+changelog = "https://hitchdev.com/commandlib/changelog"
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md",], content-type = "text/markdown"}
+version = {file = "VERSION"}

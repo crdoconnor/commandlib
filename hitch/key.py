@@ -1,271 +1,94 @@
-from hitchstory import StoryCollection, BaseEngine, no_stacktrace_for, validate
-from hitchstory import GivenDefinition, GivenProperty, InfoDefinition, InfoProperty
-from hitchstory import HitchStoryException
-from hitchrun import expected
-from strictyaml import Str, Map, MapPattern, Int, Bool, Optional, load
+from hitchstory import StoryCollection
 from pathquery import pathquery
-from hitchrun import DIR
-from hitchrunpy import ExamplePythonCode, HitchRunPyException
-from templex import Templex
+from click import argument, group, pass_context
 import hitchpylibrarytoolkit
-import dirtemplate
+from engine import Engine
 
 
-toolkit = hitchpylibrarytoolkit.ProjectToolkit(
+toolkit = hitchpylibrarytoolkit.ProjectToolkitV2(
+    "CommandLib",
     "commandlib",
-    DIR,
+    "crdoconnor/hitchstory",
+    image="",
 )
 
 
-class Engine(BaseEngine):
-    """Python engine for running tests."""
-
-    given_definition = GivenDefinition(
-        scripts=GivenProperty(MapPattern(Str(), Str())),
-        python_version=GivenProperty(Str()),
-        pexpect_version=GivenProperty(Str()),
-        icommandlib_version=GivenProperty(Str()),
-        setup=GivenProperty(Str()),
-        files=GivenProperty(MapPattern(Str(), Str())),
-        code=GivenProperty(Str()),
-    )
-
-    info_definition = InfoDefinition(
-        importance=InfoProperty(schema=Int()),
-        docs=InfoProperty(schema=Str()),
-        fails_on_python_2=InfoProperty(schema=Bool()),
-    )
-
-    def __init__(self, keypath, rewrite=False):
-        self.path = keypath
-        self._rewrite = rewrite
-        self._cprofile = False
-
-    def set_up(self):
-        """Set up your applications and the test environment."""
-        self.path.state = self.path.gen.joinpath("state")
-        if self.path.state.exists():
-            self.path.state.rmtree(ignore_errors=True)
-        self.path.state.mkdir()
-
-        for script in self.given.get("scripts", []):
-            script_path = self.path.state.joinpath(script)
-
-            if not script_path.dirname().exists():
-                script_path.dirname().makedirs()
-
-            script_path.write_text(self.given["scripts"][script])
-            script_path.chmod("u+x")
-
-        for filename, contents in self.given.get("files", {}).items():
-            self.path.state.joinpath(filename).write_text(contents)
-
-        self.python = hitchpylibrarytoolkit.project_build(
-            "commandlib", self.path, self.given["python version"]
-        ).bin.python
-
-        self.example_py_code = (
-            ExamplePythonCode(self.python, self.path.state)
-            .with_code(self.given.get("code", ""))
-            .with_setup_code(self.given.get("setup", ""))
-        )
-
-    def _story_friendly_output(self, text):
-        return text.replace(self.path.state, "/path/to")
-
-    @no_stacktrace_for(AssertionError)
-    @no_stacktrace_for(HitchRunPyException)
-    @validate(
-        code=Str(),
-        will_output=Str(),
-        raises=Map(
-            {
-                Optional("type"): Map({"in python 2": Str(), "in python 3": Str()})
-                | Str(),
-                Optional("message"): Map({"in python 2": Str(), "in python 3": Str()})
-                | Str(),
-            }
-        ),
-    )
-    def run(self, code, will_output=None, raises=None):
-        to_run = self.example_py_code.with_code(code)
-
-        if self._cprofile:
-            to_run = to_run.with_cprofile(
-                self.path.profile.joinpath("{0}.dat".format(self.story.slug))
-            )
-
-        result = (
-            to_run.expect_exceptions().run() if raises is not None else to_run.run()
-        )
-
-        if will_output is not None:
-            actual_output = "\n".join(
-                [line.rstrip() for line in result.output.split("\n")]
-            )
-            try:
-                Templex(will_output).assert_match(actual_output)
-            except AssertionError:
-                if self._rewrite:
-                    self.current_step.update(**{"will output": actual_output})
-                else:
-                    raise
-
-        if raises is not None:
-            differential = False  # Difference between python 2 and python 3 output?
-            exception_type = raises.get("type")
-            message = raises.get("message")
-
-            if exception_type is not None:
-                if not isinstance(exception_type, str):
-                    differential = True
-                    exception_type = (
-                        exception_type["in python 2"]
-                        if self.given["python version"].startswith("2")
-                        else exception_type["in python 3"]
-                    )
-
-            if message is not None:
-                if not isinstance(message, str):
-                    differential = True
-                    message = (
-                        message["in python 2"]
-                        if self.given["python version"].startswith("2")
-                        else message["in python 3"]
-                    )
-
-            try:
-                result = self.example_py_code.expect_exceptions().run()
-                result.exception_was_raised(exception_type)
-                exception_message = self._story_friendly_output(
-                    result.exception.message
-                )
-                Templex(exception_message).assert_match(message)
-            except AssertionError:
-                if self._rewrite and not differential:
-                    new_raises = raises.copy()
-                    new_raises["message"] = self._story_friendly_output(
-                        result.exception.message
-                    )
-                    self.current_step.update(raises=new_raises)
-                else:
-                    raise
-
-    def file_contents_will_be(self, filename, contents):
-        file_contents = "\n".join(
-            [
-                line.rstrip()
-                for line in self.path.state.joinpath(filename)
-                .bytes()
-                .decode("utf8")
-                .strip()
-                .split("\n")
-            ]
-        )
-        try:
-            # Templex(file_contents).assert_match(contents.strip())
-            assert file_contents == contents.strip(), "{0} not {1}".format(
-                file_contents, contents.strip()
-            )
-        except AssertionError:
-            if self._rewrite:
-                self.current_step.update(contents=file_contents)
-            else:
-                raise
-
-    def pause(self, message="Pause"):
-        import IPython
-
-        IPython.embed()
-
-    def on_success(self):
-        if self._cprofile:
-            self.python(
-                self.path.key.joinpath("printstats.py"),
-                self.path.profile.joinpath("{0}.dat".format(self.story.slug)),
-            ).run()
+@group(invoke_without_command=True)
+@pass_context
+def cli(ctx):
+    """Integration test command line interface."""
+    pass
 
 
-def _storybook(**kwargs):
-    return StoryCollection(pathquery(DIR.key).ext("story"), Engine(DIR, **kwargs))
+DIR = toolkit.DIR
 
 
-def _personal_settings():
-    settings_file = DIR.key.joinpath("personalsettings.yml")
-
-    if not settings_file.exists():
-        settings_file.write_text(
-            (
-                "engine:\n"
-                "  rewrite: no\n"
-                "  cprofile: no\n"
-                "params:\n"
-                "  python version: 3.7.0n"
-            )
-        )
-    return load(
-        settings_file.bytes().decode("utf8"),
-        Map(
-            {
-                "engine": Map({"rewrite": Bool(), "cprofile": Bool()}),
-                "params": Map({"python version": Str()}),
-            }
-        ),
-    )
+def _storybook(**settings):
+    return StoryCollection(pathquery(DIR.key).ext("story"), Engine(DIR, **settings))
 
 
-@expected(HitchStoryException)
-def bdd(*keywords):
+def _current_version():
+    return DIR.project.joinpath("VERSION").text().rstrip()
+
+
+def _devenv():
+    return toolkit.devenv()
+
+
+@cli.command()
+@argument("keywords", nargs=-1)
+def rbdd(keywords):
     """
-    Run tests matching keywords.
+    Run story with name containing keywords and rewrite.
     """
-    settings = _personal_settings().data
-    _storybook().with_params(
-        **{"python version": settings["params"]["python version"]}
-    ).only_uninherited().shortcut(*keywords).play()
+    _storybook(python_path=_devenv().python_path, rewrite=True).shortcut(
+        *keywords
+    ).play()
 
 
-@expected(HitchStoryException)
-def rbdd(*keywords):
+@cli.command()
+@argument("keywords", nargs=-1)
+def bdd(keywords):
     """
-    Run tests matching keywords and rewrite test if output changed.
+    Run story with name containing keywords.
     """
-    settings = _personal_settings().data
-    _storybook(rewrite=True).with_params(
-        **{"python version": settings["params"]["python version"]}
-    ).only_uninherited().shortcut(*keywords).play()
+    _storybook(python_path=_devenv().python_path).shortcut(*keywords).play()
 
 
-@expected(HitchStoryException)
+@cli.command()
+@argument("filename")
 def regressfile(filename):
     """
-    Run all stories in filename 'filename' in python 2 and 3.
-
-    Rewrite stories if appropriate.
+    Run all stories in filename 'filename'.
     """
-    _storybook().in_filename(filename).with_params(
-        **{"python version": "2.7.14"}
-    ).ordered_by_name().play()
-    _storybook().with_params(**{"python version": "3.7.0"}).in_filename(
-        filename
-    ).ordered_by_name().play()
+    StoryCollection(
+        pathquery(DIR.key).ext("story"), Engine(DIR, python_path=_devenv().python_path)
+    ).in_filename(filename).ordered_by_name().play()
 
 
-@expected(HitchStoryException)
+@cli.command()
+def rewriteall():
+    """
+    Run all stories in rewrite mode.
+    """
+    StoryCollection(
+        pathquery(DIR.key).ext("story"),
+        Engine(DIR, python_path=_devenv().python_path, rewrite=True),
+    ).only_uninherited().ordered_by_name().play()
+
+
+@cli.command()
 def regression():
     """
-    Run regression testing - lint and then run all tests.
+    Continuos integration - lint and run all stories.
     """
-    storybook = _storybook().only_uninherited()
-    storybook.with_params(**{"python version": "2.7.14"}).filter(
-        lambda story: not story.info.get("fails on python 2", False)
-    ).ordered_by_name().play().report()
-    storybook.with_params(
-        **{"python version": "3.7.0"}
-    ).ordered_by_name().play().report()
-    lint()
+    # toolkit.lint(exclude=["__init__.py"])
+    StoryCollection(
+        pathquery(DIR.key).ext("story"), Engine(DIR, python_path=_devenv().python_path)
+    ).only_uninherited().ordered_by_name().play()
 
 
+@cli.command()
 def reformat():
     """
     Reformat using black and then relint.
@@ -273,6 +96,7 @@ def reformat():
     toolkit.reformat()
 
 
+@cli.command()
 def lint():
     """
     Lint project code and hitch code.
@@ -280,24 +104,85 @@ def lint():
     toolkit.lint(exclude=["__init__.py"])
 
 
-def deploy(version):
+@cli.command()
+@argument("test", required=False)
+def deploy(test="test"):
     """
     Deploy to pypi as specified version.
     """
-    toolkit.readmegen(version)
+    testpypi = not (test == "live")
+    toolkit.deploy(testpypi=testpypi)
 
 
-@expected(dirtemplate.exceptions.DirTemplateException)
-def docgen():
+@cli.command()
+def draftdocs():
     """
     Build documentation.
     """
-    toolkit.docgen(Engine(DIR))
+    toolkit.draft_docs(storybook=_storybook(python_path=_devenv().python_path))
 
 
-@expected(dirtemplate.exceptions.DirTemplateException)
-def readmegen():
-    """
-    Build documentation.
-    """
-    toolkit.readmegen(Engine(DIR))
+@cli.command()
+def publishdocs():
+    """Publish pushed docs."""
+    toolkit.publish(storybook=_storybook(python_path=_devenv().python_path))
+
+
+@cli.command()
+def build():
+    _devenv()
+
+
+@cli.command()
+def cleanpyenv():
+    pyenv.Pyenv(DIR.gen / "pyenv").clean()
+
+
+@cli.command()
+def cleandevenv():
+    DIR.gen.joinpath("pyenv", "versions", "devvenv").remove()
+
+
+@cli.command()
+@argument("strategy_name", nargs=1)
+def envirotest(strategy_name):
+    """Run tests on package / python version combinations."""
+    import envirotest
+    import pyenv
+
+    test_package = pyenv.PythonRequirements(
+        [
+            "hitchstory=={}".format(_current_version()),
+        ],
+        test_repo=True,
+    )
+
+    test_package = pyenv.PythonProjectDirectory(DIR.project)
+
+    prerequisites = [
+        pyenv.PythonVersionDependentRequirement(
+            package="markupsafe",
+            lower_version="2.0.0",
+            python_version_threshold="3.9",
+            higher_version="2.1.2",
+        ),
+        pyenv.PythonRequirements(
+            [
+                "ensure",
+            ]
+        ),
+    ]
+
+    envirotest.run_test(
+        pyenv.Pyenv(DIR.gen / "pyenv"),
+        DIR.project.joinpath("pyproject.toml").text(),
+        test_package,
+        prerequisites,
+        strategy_name,
+        _storybook,
+        lambda python_path: False,
+    )
+
+
+if __name__ == "__main__":
+    cli()

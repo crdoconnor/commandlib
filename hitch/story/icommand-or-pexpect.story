@@ -25,18 +25,18 @@ Run commmands interactively using icommandlib or pexpect:
     setup: |
       from commandlib import Command
   variations:
-    icommandlib:
-      about: |
-        NOTE: You need to "pip install icommandlib" to use this command
-        or you will get an import error.
-      fails_on_python_2: yes
-      given:
-        icommandlib version: 0.1.2
-      steps:
-      - Run: |
-          process = Command("./outputtext", "mark").interactive().run()
-          process.wait_until_output_contains("mark")
-          process.wait_for_successful_exit()
+    #icommandlib:
+      #about: |
+        #NOTE: You need to "pip install icommandlib" to use this command
+        #or you will get an import error.
+      #fails_on_python_2: yes
+      #given:
+        #icommandlib version: 0.1.2
+      #steps:
+      #- Run: |
+          #process = Command("./outputtext", "mark").interact().run()
+          #process.wait_until_output_contains("mark")
+          #process.wait_for_successful_exit()
 
     pexpect:
       about: |

@@ -1,10 +1,11 @@
+*.kate-swp
+*.pyc
 build/
 dist/
-.cache
 commandlib.egg-info/
-__pycache__
-*.pyc
-*.kate-swp
-hitch/gen
-hitch/personalsettings.yml
+docs/snippets/
+docs/draft/
+docs/src/using/
 temp/
+hitch/devenv.yml
+hitchpylibrarytoolkit

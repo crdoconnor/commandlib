@@ -9,7 +9,7 @@ Quickstart:
       from commandlib import Command
 
       # Create base command
-      python = Command("python")
+      python = Command("/usr/bin/python3")
 
       # Create command "python manage.py" that runs in the django directory
       manage = python("manage.py").in_dir("django")
