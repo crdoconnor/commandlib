@@ -8,7 +8,7 @@ from engine import Engine
 toolkit = hitchpylibrarytoolkit.ProjectToolkitV2(
     "CommandLib",
     "commandlib",
-    "crdoconnor/hitchstory",
+    "crdoconnor/commandlib",
     image="",
 )
 
@@ -152,7 +152,7 @@ def envirotest(strategy_name):
 
     test_package = pyenv.PythonRequirements(
         [
-            "hitchstory=={}".format(_current_version()),
+            "commandlib=={}".format(_current_version()),
         ],
         test_repo=True,
     )
