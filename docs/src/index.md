@@ -107,6 +107,6 @@ Features which only commandlib has:
 
 * os.system(*) - only capable of running very simple bash commands.
 
-* [sh](https://amoffat.github.io/sh/) - uses a lot of magic. Attempts to make python more like shell rather than making running commands more pythonic.
+* [sh](https://github.com/amoffat/sh) - uses a lot of magic. Attempts to make python more like shell rather than making running commands more pythonic.
 
 * [plumbum](https://plumbum.readthedocs.io/en/latest/) - similar to amoffat's sh, tries to make a sort of "bash inside python". Also has a weird way of building commands from dict syntax (grep["-v", "\\.py"]).
